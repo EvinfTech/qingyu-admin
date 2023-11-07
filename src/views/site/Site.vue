@@ -1,8 +1,11 @@
 <template>
-    <div>
-        <el-row>
+    <div style="height: 100%">
+        <el-row class="outer">
 
-            <el-col :span="20">
+            <el-col :span="2">
+            </el-col>
+
+            <el-col :span="18">
                 <el-table :data="tableData" style="width: 100%" size="large" :cell-style="cell2">
                     <el-table-column prop="time" label="" class="time"  align="center"/>
                     <el-table-column v-for="ground in groundList" :prop="ground" :label="ground" :min-width="itemWidth"  align="center">
@@ -11,63 +14,68 @@
                                 <span>占用</span>
                             </div>
                             <div v-else class="cell3">
-                                <span>空闲</span>
+                                <span>￥100</span>
                             </div>
                         </template>
                     </el-table-column>
                 </el-table>
             </el-col>
 
-            <el-col :span="4">
-                <h4 class="title-left">预约信息</h4>
-                <el-form :model="form" label-width="3.5vw">
+            <el-col :span="4" style="height: 100%">
+                <div class="div-right">
+                    <h4 class="title-left">预约信息</h4>
+                    <el-form :model="form" label-width="2.5vw">
 
-                    <el-form-item label="姓名">
-                        <el-input v-model="form.name" placeholder="用户姓名"/>
-                    </el-form-item>
-                    <el-form-item label="手机">
-                        <el-input v-model="form.phone" placeholder="手机号码" />
-                    </el-form-item>
-                    <el-form-item label="备注">
-                        <el-input v-model="form.remark" placeholder="备注信息" />
-                    </el-form-item>
-                    
-                    <el-row class="center">
-                        <el-col :span="12"><h4 class="title-left">场次信息</h4></el-col>
-                        <el-col :span="4" :offset="8"><el-text class="mx-1">全选</el-text></el-col>
-                    </el-row>
-                    <template v-for="ground in grounds">
-                        <el-row class="center item-card" style="background-color: #EFF3FF;">
-                            <el-col :span="2">
-                                <!-- <el-checkbox :label="ground" size="large" /> -->
-                                <input type="checkbox" :value="ground" v-model="form.items">
+                        <el-form-item label="姓名">
+                            <el-input v-model="form.name" placeholder="用户姓名"/>
+                        </el-form-item>
+                        <el-form-item label="手机">
+                            <el-input v-model="form.phone" placeholder="手机号码" />
+                        </el-form-item>
+                        <el-form-item label="备注">
+                            <el-input v-model="form.remark" placeholder="备注信息" />
+                        </el-form-item>
+                        
+                        <el-row class="center">
+                            <el-col :span="12">
+                                <h4 class="title-left">场次信息</h4>
                             </el-col>
-                            <el-col :span="20">
-                                <el-row><el-text class="mx-1">线下预约：{{ground}}号场</el-text></el-row>
-                                <el-row class="center">
-                                    <el-col :span="5.5"><p class="text-date">今天08-08</p></el-col>
-                                    <el-col :span="7"><p class="text-time">14:00-15:00</p></el-col>
-                                    <el-col :span="4" :offset="6"><p class="text-money">￥100</p></el-col>
-                                </el-row>
+                            <el-col :span="4" :offset="8">
+                                <el-text class="mx-1" @click="chooseAll">全选</el-text>
                             </el-col>
                         </el-row>
-                    </template>
+                        <template v-for="ground in grounds">
+                            <el-row class="center item-card" style="background-color: #EFF3FF;">
+                                <el-col :span="2">
+                                    <!-- <el-checkbox :label="ground" size="large" /> -->
+                                    <input type="checkbox" :value="ground" v-model="form.items">
+                                </el-col>
+                                <el-col :span="20">
+                                    <el-row><el-text class="mx-1">线下预约：{{ground}}号场</el-text></el-row>
+                                    <el-row class="center">
+                                        <el-col :span="5.5"><p class="text-date">今天08-08</p></el-col>
+                                        <el-col :span="7"><p class="text-time">14:00-15:00</p></el-col>
+                                        <el-col :span="4" :offset="6"><p class="text-money">￥100</p></el-col>
+                                    </el-row>
+                                </el-col>
+                            </el-row>
+                        </template>
 
-                    <div class="form-bottom">
-                        <el-row>
-                            <el-col :span="6" class="text-total">
-                                合计：
-                            </el-col>
-                            <el-col :span="6" :offset="9">
-                                <el-text class="text-total-money">￥200</el-text>
-                            </el-col>
-                        </el-row>
-                        <el-row>
-                            <el-button type="primary" @click="onSubmit" style="width: 100%">结算</el-button>
-                        </el-row>
-                    </div>
-                </el-form>
-                    
+                        <div class="form-bottom">
+                            <el-row>
+                                <el-col :span="6" class="text-total">
+                                    合计：
+                                </el-col>
+                                <el-col :span="6" :offset="9">
+                                    <el-text class="text-total-money">￥200</el-text>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-button type="primary" @click="onSubmit" style="width: 100%">结算</el-button>
+                            </el-row>
+                        </div>
+                    </el-form>
+                </div>
             </el-col>
 
         </el-row>
@@ -77,15 +85,22 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
+import type { Ref } from 'vue'
 
 const grounds = [1, 2, 3]
+
+const _items :Ref<Number[]> = ref([])
 
 const form = reactive({
   name: '',
   phone: '',
   remark: '',
-  items: ref([]),
+  items: _items,
 })
+
+const chooseAll = () => {
+    _items.value = grounds;
+}
 
 const onSubmit = () => {
   console.log('submit!')
@@ -149,29 +164,84 @@ const tableData = [
         "7号场": 1,
         "8号场": 1,
     },
+    {
+        "time": "09:00--10:00",
+    },
+    {
+        "time": "10:00--11:00",
+    },
+    {
+        "time": "12:00--13:00",
+    },
+    {
+        "time": "13:00--14:00",
+    },
+    {
+        "time": "14:00--15:00",
+    },
+    {
+        "time": "15:00--16:00",
+    },
+    {
+        "time": "16:00--17:00",
+        "3号场": 1,
+        "4号场": 1,
+        "5号场": 1,
+    },
+    {
+        "time": "17:00--18:00",
+    },
+    {
+        "time": "18:00--19:00",
+    },
+    {
+        "time": "19:00--20:00",
+    },
+    {
+        "time": "20:00--21:00",
+        "2号场": 1,
+    },
+    {
+        "time": "21:00--22:00",
+    },
+    {
+        "time": "22:00--23:00",
+    },
 ];
 </script>
 
 <style scoped>
+.outer{
+    height: 100%;
+    background-color: #f6f8fa;
+}
     .cell3 {
         height: 5vh;
         padding:0;
         display: flex;
         align-items: center;
         justify-content: center;
+        background: #EFF3FF;
+        border-radius: 2px;
     }
     .exist {
         background-color: skyblue;
     }
-
     .title-left{
         text-align: left;
-        margin-left: 2vw;
+        margin-left: 1vw;
         margin-top: 0;
+        padding-top: 2vh;
     }
     .center{
         display: flex;
         align-items: center;
+    }
+
+    .div-right{
+        height: 100%;
+        margin-left: 1rem;
+        background-color: #FFFFFF;
     }
     .text-date{
         font-size: 12px;
@@ -191,7 +261,7 @@ const tableData = [
         margin-bottom: 5px;
     }
     .item-card{
-        margin: 3px 0 0 2vw;
+        margin: 3px 0 0 1vw;
         padding-top: 6px;
     }
     .form-bottom{
@@ -199,10 +269,6 @@ const tableData = [
         position: fixed;
         bottom: 2vh; 
         margin-left: 2vw;
-    }
-    .text-total{
-        display:flex;
-        align-items:flex-end;
     }
     .text-total-money{
         font-size: 22px;
