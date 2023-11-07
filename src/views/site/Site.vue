@@ -2,24 +2,35 @@
     <div style="height: 100%">
         <el-row class="outer">
 
-            <el-col :span="2">
-            </el-col>
+            <!-- <el-col :span="1">
+                <div style="height: 0.2rem;"></div>
+                <p v-for="hour in hourList" class="text-hour">{{ hour }}</p>
+            </el-col> -->
 
-            <el-col :span="18">
+            <el-col :span="19">
                 <el-table :data="tableData" style="width: 100%" size="large" :cell-style="cell2">
-                    <el-table-column prop="time" label="" class="time"  align="center"/>
-                    <el-table-column v-for="ground in groundList" :prop="ground" :label="ground" :min-width="itemWidth"  align="center">
+                    <el-table-column prop="time" class="text-hour"  align="center"/>
+                    <el-table-column v-for="ground in groundList"
+                    :prop="ground"
+                    :label="ground"
+                    :width="itemWidth"
+                    align="center">
                         <template #default="scope">
-                            <div v-if="scope.row[ground] === 1" class="cell3 exist" >
-                                <span>占用</span>
+                            <div v-if="scope.row[ground] === 1" class="cell3 online" >
+                                <span class="text-online">线上预定</span>
+                            </div>
+                            <div v-else-if="scope.row[ground] === 2" class="cell3 offline" >
+                                <span class="text-offline">线下预定</span>
                             </div>
                             <div v-else class="cell3">
-                                <span>￥100</span>
+                                <span class="cell3-empty">￥100</span>
                             </div>
                         </template>
                     </el-table-column>
                 </el-table>
             </el-col>
+
+            <el-col :span="1" style="background-color: #FFFFFF" />
 
             <el-col :span="4" style="height: 100%">
                 <div class="div-right">
@@ -54,7 +65,7 @@
                                     <el-row><el-text class="mx-1">线下预约：{{ground}}号场</el-text></el-row>
                                     <el-row class="center">
                                         <el-col :span="5.5"><p class="text-date">今天08-08</p></el-col>
-                                        <el-col :span="7"><p class="text-time">14:00-15:00</p></el-col>
+                                        <el-col :span="7.5"><p class="text-time">14:00-15:00</p></el-col>
                                         <el-col :span="4" :offset="6"><p class="text-money">￥100</p></el-col>
                                     </el-row>
                                 </el-col>
@@ -66,8 +77,8 @@
                                 <el-col :span="6" class="text-total">
                                     合计：
                                 </el-col>
-                                <el-col :span="6" :offset="9">
-                                    <el-text class="text-total-money">￥200</el-text>
+                                <el-col :span="8" :offset="7">
+                                    <el-text class="text-total-money">￥200.00</el-text>
                                 </el-col>
                             </el-row>
                             <el-row>
@@ -119,93 +130,181 @@ const groundList = [
     "10号场"
 ];
 
-var itemWidth = (500 / groundList.length) + "%";
+const itemWidth = (1700 / groundList.length) + "vw";
 
 function cell2() {
     return {
-        "padding": 0,
-        "padding-left": "0px",
-        "padding-right": "0px",
+        "padding-left": 0,
+        "padding-right": 0,
+        "padding-top": "0.2rem",
+        "padding-bottom": "0.2rem",
     };
 }
 
 
 const tableData = [
     {
-        "time": "06:00--07:00",
+        "time": "06:00",
+        "1号场": 1,
+        "2号场": 1,
+        "3号场": 1,
+        "4号场": 1,
+        "5号场": 2,
+        "6号场": 1,
+        "7号场": 0,
+        "8号场": 1,
+    },
+    {
+        "time": "06:00",
         "1号场": 1,
         "2号场": 1,
         "3号场": 1,
         "4号场": 1,
         "5号场": 1,
-        "6号场": 1,
-        "7号场": 1,
+        "6号场": 2,
+        "7号场": 0,
         "8号场": 1,
     },
     {
-        "time": "07:00--08:00",
+        "time": "06:00",
         "1号场": 1,
         "2号场": 1,
-        "3号场": 1,
+        "3号场": 2,
         "4号场": 1,
         "5号场": 1,
         "6号场": 1,
-        "7号场": 1,
+        "7号场": 0,
         "8号场": 1,
     },
     {
-        "time": "08:00--09:00",
-        "1号场": 1,
-        "2号场": 1,
-        "3号场": 1,
-        "4号场": 1,
-        "5号场": 1,
-        "6号场": 1,
-        "7号场": 1,
-        "8号场": 1,
-    },
-    {
-        "time": "09:00--10:00",
-    },
-    {
-        "time": "10:00--11:00",
-    },
-    {
-        "time": "12:00--13:00",
-    },
-    {
-        "time": "13:00--14:00",
-    },
-    {
-        "time": "14:00--15:00",
-    },
-    {
-        "time": "15:00--16:00",
-    },
-    {
-        "time": "16:00--17:00",
+        "time": "06:00",
         "3号场": 1,
         "4号场": 1,
         "5号场": 1,
     },
     {
-        "time": "17:00--18:00",
-    },
-    {
-        "time": "18:00--19:00",
-    },
-    {
-        "time": "19:00--20:00",
-    },
-    {
-        "time": "20:00--21:00",
+        "time": "06:00",
         "2号场": 1,
     },
     {
-        "time": "21:00--22:00",
+        "1号场": 0,
+        "2号场": 0,
+        "3号场": 0,
+        "4号场": 1,
+        "5号场": 0,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 0,
     },
     {
-        "time": "22:00--23:00",
+        "1号场": 0,
+        "2号场": 0,
+        "3号场": 0,
+        "4号场": 0,
+        "5号场": 0,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 0,
+    },
+    {
+        "1号场": 0,
+        "2号场": 0,
+        "3号场": 2,
+        "4号场": 0,
+        "5号场": 0,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 0,
+    },
+    {
+        "1号场": 0,
+        "2号场": 0,
+        "3号场": 0,
+        "4号场": 2,
+        "5号场": 0,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 0,
+    },
+    {
+        "1号场": 0,
+        "2号场": 0,
+        "3号场": 0,
+        "4号场": 0,
+        "5号场": 0,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 0,
+    },
+    {
+        "1号场": 0,
+        "2号场": 0,
+        "3号场": 0,
+        "4号场": 1,
+        "5号场": 0,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 0,
+    },
+    {
+        "1号场": 0,
+        "2号场": 0,
+        "3号场": 0,
+        "4号场": 0,
+        "5号场": 0,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 0,
+    },
+    {
+        "1号场": 0,
+        "2号场": 2,
+        "3号场": 0,
+        "4号场": 0,
+        "5号场": 0,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 0,
+    },
+    {
+        "1号场": 0,
+        "2号场": 0,
+        "3号场": 0,
+        "4号场": 0,
+        "5号场": 0,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 0,
+    },
+    {
+        "1号场": 0,
+        "2号场": 0,
+        "3号场": 0,
+        "4号场": 0,
+        "5号场": 0,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 1,
+    },
+    {
+        "1号场": 0,
+        "2号场": 0,
+        "3号场": 1,
+        "4号场": 0,
+        "5号场": 0,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 0,
+    },
+    {
+        "1号场": 0,
+        "2号场": 0,
+        "3号场": 0,
+        "4号场": 0,
+        "5号场": 1,
+        "6号场": 0,
+        "7号场": 0,
+        "8号场": 0,
     },
 ];
 </script>
@@ -214,6 +313,11 @@ const tableData = [
 .outer{
     height: 100%;
     background-color: #f6f8fa;
+}
+.text-hour{
+    margin-top: 2.6rem;
+    margin-bottom: 0rem;
+    margin-left: 3rem;
 }
     .cell3 {
         height: 5vh;
@@ -224,8 +328,22 @@ const tableData = [
         background: #EFF3FF;
         border-radius: 2px;
     }
-    .exist {
-        background-color: skyblue;
+    .cell3-empty{
+        font-size: 15px;
+        color: #9E9E9E;
+    }
+    .online{
+        background: #FFC300;
+    }
+    .text-online{
+        color: #FFFFFF;
+    }
+    .offline {
+        background: #0077FF;
+    }
+    .text-offline{
+        font-size: 15px;
+        color: #FFFFFF;
     }
     .title-left{
         text-align: left;
@@ -241,6 +359,7 @@ const tableData = [
     .div-right{
         height: 100%;
         margin-left: 1rem;
+        padding-right: 2rem;
         background-color: #FFFFFF;
     }
     .text-date{
@@ -251,8 +370,9 @@ const tableData = [
     }
     .text-time{
         font-size: 13px;
-        margin-top: 1px;
+        margin-top: 0.15rem;
         margin-bottom: 5px;
+        margin-left: 0.4rem;
     }
     .text-money{
         font-size: 15px;
