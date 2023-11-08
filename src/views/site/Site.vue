@@ -2,11 +2,31 @@
     <div style="height: 100%">
         <el-row class="outer">
 
-            <el-col :span="19">
+            <el-col :span="19" class="main-big">
+                <el-row style="height: 1vh;" />
+                <el-row>
+                    <el-button round size="large">今天 08-08</el-button>
+                    <el-button round size="large">明天 08-09</el-button>
+                    <el-button round size="large">后天 08-10</el-button>
+                    <el-button round size="large">周四 08-11</el-button>
+                    <el-button round size="large">周五 08-12</el-button>
+                    <el-button round size="large">周六 08-13</el-button>
+                    <el-button round size="large">周日 08-14</el-button>
+                    <div style="width: 0.5vw;"/>
+                    <el-date-picker
+                    v-model="date"
+                    type="date"
+                    placeholder="选择日期"
+                    size="large"
+                    :editable="false"
+                    :clearable="false"
+                />
+                </el-row>
+
                 <div class="header-row">
-                    <div v-for="header in groundList" class="cell4">
+                    <div v-for="header in groundList" class="cell-width">
                         <span class="header-cell">{{ header }}</span>
-                </div>
+                    </div>
                 </div>
                 <template v-for="ground in tableData" :key="ground.time">
                     <!-- <template #default="scope"> -->
@@ -14,8 +34,8 @@
                         <div class="cell-time">
                             {{ ground.time }}
                         </div>
-                        <div v-for="i in groundList" class="cell4">
-                            <div v-if="isOvertime(ground.time)" class="cell3 overtime" >
+                        <div v-for="i in groundList" class="cell-width">
+                            <div v-if="isOvertime(<string>ground.time)" class="cell3 overtime" >
                                 <span class="text-online">￥100</span>
                             </div>
                             <div v-else-if="ground[i] == 1" class="cell3 online" >
@@ -24,12 +44,7 @@
                             <div v-else-if="ground[i] == 2" class="cell3 offline" >
                                 <span class="text-offline">线下预定</span>
                             </div>
-                            <div v-else-if="isChose(ground, i)" class="cell3 cell3-chose" >
-                                <span class="cell3-empty">￥1002</span>
-                            </div>
-                            <div v-else class="cell3 cell3-empty-ct" @click="() => choose(ground, i)">
-                                <span class="cell3-empty">￥100</span>
-                            </div>
+                            <CanChoose v-else @click="() => choose(ground, i)"/>
                         </div>
                     </div>
                 </template>
@@ -39,8 +54,6 @@
                     </div>
                 </div>
             </el-col>
-
-            <el-col :span="1" style="background-color: #FFFFFF" />
 
             <el-col :span="4" style="height: 100%">
                 <div class="div-right">
@@ -65,21 +78,23 @@
                                 <el-text class="mx-1" @click="chooseAll">全选</el-text>
                             </el-col>
                         </el-row>
-                        <template v-for="ground in grounds">
-                            <el-row class="center item-card" style="background-color: #EFF3FF;">
-                                <el-col :span="2">
-                                    <!-- <el-checkbox :label="ground" size="large" /> -->
-                                    <input type="checkbox" :value="ground" v-model="form.items">
-                                </el-col>
-                                <el-col :span="20">
-                                    <el-row><el-text class="mx-1">线下预约：{{ground}}号场</el-text></el-row>
-                                    <el-row class="center">
-                                        <el-col :span="5.5"><p class="text-date">今天08-08</p></el-col>
-                                        <el-col :span="7.5"><p class="text-time">14:00-15:00</p></el-col>
-                                        <el-col :span="4" :offset="6"><p class="text-money">￥100</p></el-col>
-                                    </el-row>
-                                </el-col>
-                            </el-row>
+                        <template v-for="[k, v] in choseMap.entries()">
+                            <template v-for="i in v.values()">
+                                <el-row class="center item-card" style="background-color: #EFF3FF;">
+                                    <el-col :span="2">
+                                        <!-- <el-checkbox :label="ground" size="large" /> -->
+                                        <input type="checkbox" :value="groundList">
+                                    </el-col>
+                                    <el-col :span="20">
+                                        <el-row><el-text class="mx-1">线下预约：{{ i }}</el-text></el-row>
+                                        <el-row class="center">
+                                            <el-col :span="5.5"><p class="text-date">今天08-08</p></el-col>
+                                            <el-col :span="7.5"><p class="text-time">{{ timeAndNextTime(k) }}</p></el-col>
+                                            <el-col :span="4" :offset="6"><p class="text-money">￥100</p></el-col>
+                                        </el-row>
+                                    </el-col>
+                                </el-row>
+                            </template>
                         </template>
 
                         <div class="form-bottom">
@@ -108,10 +123,29 @@
 import { ref, reactive } from 'vue'
 import type { Ref } from 'vue'
 
+import CanChoose from './CanChoose.vue'
+
 var currentHour = (new Date()).getHours();
 
+const date = ref('')
 
 const grounds = [1, 2, 3]
+
+const choseMap : Ref<Map<string, Set<string>>> = ref(new Map())
+
+const choose = (data: Data, index: string) => {
+    let t = data.time as string;
+    if (choseMap.value.has(t)) {
+        let list = choseMap.value.get(t)!;
+        if (list.has(index)) {
+            list.delete(index)
+        } else {
+            list.add(index)
+        }        
+    } else {
+        choseMap.value.set(t, new Set([index]))
+    }
+}
 
 const _items :Ref<Number[]> = ref([])
 
@@ -150,8 +184,6 @@ const groundList = [
     "9号场",
     "10号场"
 ];
-
-const itemSpan = 24 / (groundList.length+1);
 
 interface Data {
     [index: string]: string|number,
@@ -335,41 +367,10 @@ const tableData : Data[] = [
     }
 ];
 
-const choseList : Data[] = []
-
-const choose = (data: Data, index: string) => {
-    console.log(data);
-    console.log(index);
-    let flag = false;
-    choseList.forEach((item) => {
-        console.log(item);
-        
-        if (item.time === data.time) {
-            item[index] = 5;
-            flag = true;
-            return;
-        }
-    })
-    if (!flag) {
-        choseList.push({
-        time: data.time,
-        [index]: 5,
-    })
-    }
-    console.log(choseList);
-    
-}
-
-const isChose = (data: Data, index: string) => {
-    choseList.forEach((item) => {
-        if (item.time == data.time) {
-            if (item[index] == 5) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    })
+const timeAndNextTime = (t: string) : string => {
+    let hour = parseInt(t.substring(0, 3));
+    let nexthour = (hour + 1).toString().padStart(2)
+    return `${t}-${nexthour}:00`;
 }
 
 </script>
@@ -378,6 +379,11 @@ const isChose = (data: Data, index: string) => {
 .outer{
     height: 100%;
     background-color: #f6f8fa;
+}
+.main-big{
+    margin-left: 0.6vw;
+    padding-right: 5vw;
+    background-color: #FFFFFF;
 }
 .header-row{
     width: 94%;
@@ -401,7 +407,7 @@ const isChose = (data: Data, index: string) => {
     margin-top: -0.5%;
     padding-left: 3%;
 }
-.cell4{
+.cell-width{
     width: 10%;
 }
     .cell3 {
