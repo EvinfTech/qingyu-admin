@@ -2,63 +2,90 @@
     <div style="height: 100%">
         <el-row class="outer">
 
-            <el-col :span="19" class="main-big">
-                <el-row style="height: 1vh;" />
-                <el-row>
-                    <el-button round size="large">今天 08-08</el-button>
-                    <el-button round size="large">明天 08-09</el-button>
-                    <el-button round size="large">后天 08-10</el-button>
-                    <el-button round size="large">周四 08-11</el-button>
-                    <el-button round size="large">周五 08-12</el-button>
-                    <el-button round size="large">周六 08-13</el-button>
-                    <el-button round size="large">周日 08-14</el-button>
-                    <div style="width: 0.5vw;"/>
-                    <el-date-picker
-                    v-model="date"
-                    type="date"
-                    placeholder="选择日期"
-                    size="large"
-                    :editable="false"
-                    :clearable="false"
-                />
+            <div class="main-left">
+                <el-row class="main-big-header">
+                    <div style="width: 2%;" />
+                    <span class="text-example-title">订场面板</span>
+                    <div class="example-container" style="background-color: #0077FF;"/>
+                    <span class="text-example">线下预定</span>
+
+                    <div class="example-container" style="background-color: #FFC300;"/>
+                    <span class="text-example">线上预定</span>
+
+                    <div class="example-container" style="background-color: #D8D8D8;"/>
+                    <span class="text-example">不可预定</span>
+
+                    <div class="example-container" style="background-color: #EFF3FF;"/>
+                    <span class="text-example">可预定</span>
+
+                    <div class="example-container example-container-chose" style="background-color: #EFF3FF;">
+                        <span class="tick">
+                            <el-icon size="10"><Check /></el-icon>
+                        </span>
+                    </div>
+                    <span class="text-example">已选择</span>
                 </el-row>
 
-                <div class="header-row">
-                    <div v-for="header in groundList" class="cell-width">
-                        <span class="header-cell">{{ header }}</span>
+                <el-row style="height: 0.7%"/>
+
+                <div class="main-big">
+                    <el-row>
+                        <div style="width: 1.5vw;" />
+                        <el-button round size="large">今天 08-08</el-button>
+                        <el-button round size="large">明天 08-09</el-button>
+                        <el-button round size="large">后天 08-10</el-button>
+                        <el-button round size="large">周四 08-11</el-button>
+                        <el-button round size="large">周五 08-12</el-button>
+                        <el-button round size="large">周六 08-13</el-button>
+                        <el-button round size="large">周日 08-14</el-button>
+                        <div style="width: 0.5%;"/>
+                        <el-date-picker
+                        v-model="date"
+                        type="date"
+                        placeholder="选择日期"
+                        size="large"
+                        :editable="false"
+                        :clearable="false"
+                    />
+                    </el-row>
+
+                    <div class="header-row">
+                        <div v-for="header in groundList" class="cell-width">
+                            <span class="header-cell">{{ header }}</span>
+                        </div>
                     </div>
-                </div>
-                <template v-for="ground in tableData" :key="ground.time">
-                    <!-- <template #default="scope"> -->
+                    <template v-for="ground in tableData" :key="ground.time">
+                        <!-- <template #default="scope"> -->
+                        <div style="width: 100%" class="cell-row">
+                            <div class="cell-time">
+                                {{ ground.time }}
+                            </div>
+                            <div v-for="i in groundList" class="cell-width">
+                                <div v-if="isOvertime(<string>ground.time)" class="cell3 overtime" >
+                                    <span class="text-online">￥100</span>
+                                </div>
+                                <div v-else-if="ground[i] == 1" class="cell3 online" >
+                                    <span class="text-online">线上预定</span>
+                                </div>
+                                <div v-else-if="ground[i] == 2" class="cell3 offline" >
+                                    <span class="text-offline">线下预定</span>
+                                </div>
+                                <CanChoose v-else @click="() => choose(ground, i)"/>
+                            </div>
+                        </div>
+                    </template>
                     <div style="width: 100%" class="cell-row">
                         <div class="cell-time">
-                            {{ ground.time }}
+                                {{ tableData[tableData.length-1].time }}
                         </div>
-                        <div v-for="i in groundList" class="cell-width">
-                            <div v-if="isOvertime(<string>ground.time)" class="cell3 overtime" >
-                                <span class="text-online">￥100</span>
-                            </div>
-                            <div v-else-if="ground[i] == 1" class="cell3 online" >
-                                <span class="text-online">线上预定</span>
-                            </div>
-                            <div v-else-if="ground[i] == 2" class="cell3 offline" >
-                                <span class="text-offline">线下预定</span>
-                            </div>
-                            <CanChoose v-else @click="() => choose(ground, i)"/>
-                        </div>
-                    </div>
-                </template>
-                <div style="width: 100%" class="cell-row">
-                    <div class="cell-time">
-                            {{ tableData[tableData.length-1].time }}
                     </div>
                 </div>
-            </el-col>
+            </div>
 
-            <el-col :span="4" style="height: 100%">
+            <div class="main-right">
                 <div class="div-right">
                     <h4 class="title-left">预约信息</h4>
-                    <el-form :model="form" label-width="2.5vw">
+                    <el-form :model="form" label-width="24%">
 
                         <el-form-item label="姓名">
                             <el-input v-model="form.name" placeholder="用户姓名"/>
@@ -88,9 +115,10 @@
                                     <el-col :span="20">
                                         <el-row><el-text class="mx-1">线下预约：{{ i }}</el-text></el-row>
                                         <el-row class="center">
-                                            <el-col :span="5.5"><p class="text-date">今天08-08</p></el-col>
-                                            <el-col :span="7.5"><p class="text-time">{{ timeAndNextTime(k) }}</p></el-col>
-                                            <el-col :span="4" :offset="6"><p class="text-money">￥100</p></el-col>
+                                            <p class="text-date">今天08-08</p>
+                                            <p class="text-time">{{ timeAndNextTime(k) }}</p>
+                                            <div class="text-space"/>
+                                            <p class="text-money">￥100</p>
                                         </el-row>
                                     </el-col>
                                 </el-row>
@@ -102,17 +130,17 @@
                                 <el-col :span="6" class="text-total">
                                     合计：
                                 </el-col>
-                                <el-col :span="8" :offset="7">
+                                <el-col :span="10" :offset="8">
                                     <el-text class="text-total-money">￥200.00</el-text>
                                 </el-col>
                             </el-row>
                             <el-row>
-                                <el-button type="primary" @click="onSubmit" style="width: 90%">结算</el-button>
+                                <el-button type="primary" @click="onSubmit" style="width: 100%">结算</el-button>
                             </el-row>
                         </div>
                     </el-form>
                 </div>
-            </el-col>
+            </div>
 
         </el-row>
 
@@ -378,13 +406,59 @@ const timeAndNextTime = (t: string) : string => {
 <style scoped>
 .outer{
     height: 100%;
-    background-color: #f6f8fa;
+    background-color: #F6F8Fa;
+}
+.main-left{
+    width: 82.4%;
+    margin-left: 0.6%;
+    background-color: #F6F8Fa;
 }
 .main-big{
-    margin-left: 0.6vw;
-    padding-right: 5vw;
+    width: 100%;
+    height: 94%;
+    padding-top: 0.5%;
+    padding-right: 7%;
     background-color: #FFFFFF;
 }
+.main-right{
+    height: 100%;
+    width: 17%;
+}
+
+.main-big-header{
+    height: 5%;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    background-color: #FFFFFF;
+}
+.text-example-title{
+    font-size: 17px;
+}
+.example-container{
+    width: 3%;
+    margin-left: 1.7%;
+    margin-right: 0.6%;
+    margin-top: 0.1%;
+    background-color: #0077FF;
+}
+.example-container-chose{
+    border: solid 1.5px;
+    border-color: #0077FF;
+    position: relative;
+}
+.tick{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: -5px;
+    color: #0077FF;
+}
+.text-example{
+    font-size: 13px;
+    margin-top:3px;
+}
+
+
 .header-row{
     width: 94%;
     margin-left: 6%;
@@ -392,7 +466,7 @@ const timeAndNextTime = (t: string) : string => {
 }
 .header-cell{
     height: 4vh;
-    margin: 0.3vh 0.2vw;
+    margin: 0.2vh 0.2vw;
     padding:0;
     display: flex;
     align-items: center;
@@ -412,7 +486,7 @@ const timeAndNextTime = (t: string) : string => {
 }
     .cell3 {
         height: 4vh;
-        margin: 0.3vh 0.2vw;
+        margin: 0.2vh 0.2vw;
         padding:0;
         display: flex;
         align-items: center;
@@ -473,6 +547,9 @@ const timeAndNextTime = (t: string) : string => {
         margin-bottom: 5px;
         margin-left: 0.4rem;
     }
+    .text-space{
+        width: calc(16vw - 20rem);
+    }
     .text-money{
         font-size: 15px;
         color: #F44336;
@@ -484,10 +561,10 @@ const timeAndNextTime = (t: string) : string => {
         padding-top: 6px;
     }
     .form-bottom{
-        width: 13%;
+        width: 12%;
         position: fixed;
-        bottom: 2vh; 
-        margin-left: 2vw;
+        bottom: 2%; 
+        margin-left: 1%;
     }
     .text-total-money{
         font-size: 22px;
