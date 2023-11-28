@@ -1,6 +1,4 @@
 import {Common} from "./modules/common"
-import {Dashboard} from "./modules/dashboard"
-import {System} from "./modules/sysyem"
 import {Site} from "./modules/site"
 import {Order} from "./modules/order"
 import {createRouter, createWebHashHistory, RouteRecordRaw} from 'vue-router'
