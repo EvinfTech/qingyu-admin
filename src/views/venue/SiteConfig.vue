@@ -1,85 +1,58 @@
-<script setup lang="ts">
-import { ref } from 'vue'
-import { Plus, Delete } from '@element-plus/icons-vue'
-
-const site_list = [
-  '时间/场地',
-  '1号场',
-  '2号场',
-  '3号场',
-  '4号场',
-  '5号场',
-  '6号场',
-]
-
-interface User {
-  date: string
-  name: string
-  address: string
-}
-
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
-const multipleSelection = ref<User[]>([])
-const toggleSelection = (rows?: User[]) => {
-  if (rows) {
-    rows.forEach((row) => {
-      // TODO: improvement typing when refactor table
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      multipleTableRef.value!.toggleRowSelection(row, undefined)
-    })
-  } else {
-    multipleTableRef.value!.clearSelection()
-  }
-}
-const handleSelectionChange = (val: User[]) => {
-  multipleSelection.value = val
-}
-
-const tableData: User[] = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-]
-</script>
-
 <template>
   <div class="site_main">
     <div>
       <el-button type="primary" :icon="Plus">新增场地</el-button>
       <el-button type="primary" :icon="Plus">新增时间段</el-button>
     </div>
+    <div class="hr"></div>
 
-    <el-table
-      ref="multipleTableRef"
-      :data="tableData"
-      style="width: 100%"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column type="selection" width="55" />
-      <el-table-column
-        v-for="item in site_list"
-        :key="item"
-        :label="item"
-        width="120"
-      >
-        <template #default="scope">￥80</template>
-        <!-- <template #default="scope">{{ scope.row.date }}</template> -->
+    <el-table :data="tableData" stripe style="width: 100%" border >
+      <el-table-column prop="id" label="场地id" width="180" />
+      <el-table-column prop="name" label="场地名称" width="180" />
+      <el-table-column prop="date" label="可预约时间" width="180" />
+      <el-table-column prop="date" label="可预约时间" width="180" />
+      <el-table-column prop="free_price" label="闲时价格" width="180" />
+      <el-table-column prop="busy_price" label="忙时价格" width="180" />
+      <el-table-column prop="status" label="状态" width="180" />
+      <el-table-column prop="weekend_busy" label="周末是否为忙时" width="180" />
+      <el-table-column prop="holiday_busy" label="假期是否为忙时" width="180" />
+      <el-table-column prop="data_busy" label="特殊忙时日期"  />
+      <el-table-column label="操作" width="120">
+        <el-button>查看\编辑</el-button>
       </el-table-column>
     </el-table>
-    <el-button type="primary" :icon="Delete">删除选中项</el-button>
   </div>
 </template>
 
-<style scoped>
+<script setup lang="ts">
+import {onMounted, ref} from 'vue'
+import { Plus, Delete } from '@element-plus/icons-vue'
+import {saasGetSiteList} from "@/api/venue";
+import {useEnumStore} from "@/stores/enum.ts";
+
+
+
+const tableData =ref<any[]>([])
+const TimeEnum = useEnumStore()
+onMounted(() =>{
+  saasGetSiteList({"shop_id":1}).then((res) =>{
+    tableData.value = res.data.data
+    console.log("表数据",tableData.value)
+  })
+  console.log("枚举数据",TimeEnum.Enum.time_enum[8])
+})
+
+</script>
+
+<style scoped lang="scss">
 .site_main {
   padding: 10px 30px;
+  .hr{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 3px;
+    width: 100%;
+    background-color: #8c939d;
+  }
 }
 </style>
