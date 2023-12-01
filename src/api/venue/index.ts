@@ -22,3 +22,10 @@ export function saasGetSiteList(data:any)  {
         data,
     })
 }
+export function saasUpdateSite(data:any)  {
+    return r.request<string[]>({//r.request会做拦截，因此响应的数据就是string[] 类型
+        url: '/saas/update/site',
+        method: 'post',
+        data,
+    })
+}

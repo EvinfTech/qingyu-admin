@@ -110,11 +110,10 @@
 </template>
 
 <script setup lang="ts">
-import {ref, nextTick, reactive, onMounted, watch} from 'vue'
+import {ref, nextTick, reactive, onMounted} from 'vue'
 import {ElMessage, ElInput} from 'element-plus'
 import {Plus} from '@element-plus/icons-vue'
-
-import type {UploadProps, UploadUserFile} from 'element-plus'
+import { UploadProps, UploadUserFile } from 'element-plus'
 import {paginationList, saasUpdateShopDetail} from "@/api/venue";
 
 
@@ -130,7 +129,7 @@ let form = reactive({
   demo: '',
   desc:'',
 
-})
+})as any
 // 多图片列表
 const fileList = ref<UploadUserFile[]>([])
 
@@ -167,7 +166,7 @@ onMounted(() => {
     form.shop_phone = res.data.data.phone
     form.work_time = res.data.data.work_time
     form.tag = res.data.data.tag
-    res.data.data.photo.forEach((value) =>{
+    res.data.data.photo.forEach((value:any) =>{
       fileList.value.push({url:value})
     })
     tagInit(res.data.data.tag)
@@ -198,7 +197,7 @@ const handleRemove: UploadProps['onRemove'] = (uploadFile: any, uploadFiles: any
   console.log(uploadFile, uploadFiles)
 }
 
-const handleSuccess: UploadProps['onSuccess'] = (uploadFile: any, uploadFiles: any) => {
+const handleSuccess: UploadProps['onSuccess'] = (uploadFile: any) => {
   fileList.value.push({url:uploadFile.data})
 }
 
@@ -239,7 +238,7 @@ function submit() {
     form.tag.push(value)
   })
 
-  saasUpdateShopDetail(form).then((res)=>{
+  saasUpdateShopDetail(form).then((res:any)=>{
     if (res.data.code == 200){
       ElMessage({message:"更新成功",type:"success"})
     }
