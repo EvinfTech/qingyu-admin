@@ -1,62 +1,75 @@
 <script setup lang="ts">
-import { storeToRefs } from "pinia"
-import {useAppStore} from "@/stores/app"
+import { onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useAppStore } from '@/stores/app'
 import { useMediaQuery } from '@vueuse/core'
-import { minScreenMaxWidth } from "@/config/app"
-import AsideMenu from "@/views/layout/AsideMenu.vue"
-import HeaderBar from "@/views/layout/HeaderBar.vue"
-import TabsChrome from "@/views/layout/TabsChrome.vue"
+import { minScreenMaxWidth } from '@/config/app'
+import AsideMenu from '@/views/layout/AsideMenu.vue'
+import HeaderBar from '@/views/layout/HeaderBar.vue'
+import TabsChrome from '@/views/layout/TabsChrome.vue'
+
+import { commonGetEnum } from '@/api/common'
+import { useEnumStore } from '@/stores/enum.ts'
 
 const isMinScreen = useMediaQuery(`(max-width: ${minScreenMaxWidth}px)`)
 const appStore = useAppStore()
 const { asideCollapse } = storeToRefs(appStore)
+
+const commonEnum = useEnumStore()
+
+onMounted(() => {
+  commonGetEnum().then((res) => {
+    console.log('获取全局枚举成功', res.data.data)
+    commonEnum.updateUserInfo(res.data.data)
+  })
+})
 </script>
 
 <template>
   <el-container class="main">
     <el-aside v-if="!isMinScreen" :width="asideCollapse ? '64px' : '250px'">
-      <AsideMenu/>
+      <AsideMenu />
     </el-aside>
     <div v-else class="aside-drawer">
       <el-drawer
-          :size="250"
-          :with-header="false"
-          :show-close="false"
-          @close="appStore.toggleAside()"
-          :modelValue="!asideCollapse"
-          direction="ltr"
+        :size="250"
+        :with-header="false"
+        :show-close="false"
+        @close="appStore.toggleAside()"
+        :modelValue="!asideCollapse"
+        direction="ltr"
       >
-        <AsideMenu/>
+        <AsideMenu />
       </el-drawer>
     </div>
     <el-container>
       <el-header>
-        <HeaderBar/>
+        <HeaderBar />
       </el-header>
-      <TabsChrome/>
+      <TabsChrome />
       <el-main>
         <router-view></router-view>
       </el-main>
-<!--      <el-footer>Footer</el-footer>-->
+      <!--      <el-footer>Footer</el-footer>-->
     </el-container>
   </el-container>
 </template>
 
 <style scoped lang="scss">
-  .main{
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    .el-aside {
-      transition: 0.3s;
-    }
-    .aside-drawer{
-      :deep(.el-drawer__body){
-        padding: 0!important;
-      }
-    }
-    .el-main{
-      padding: 0;
+.main {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  .el-aside {
+    transition: 0.3s;
+  }
+  .aside-drawer {
+    :deep(.el-drawer__body) {
+      padding: 0 !important;
     }
   }
+  .el-main {
+    padding: 0;
+  }
+}
 </style>
