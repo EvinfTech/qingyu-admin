@@ -9,7 +9,7 @@ export const Venue: RouteRecordRaw = {
     {
       path: 'base',
       component: () => import('@/views/venue/BaseConfig.vue'),
-      meta: {title: "场馆信息"},
+      meta: {icon: 'Box', title: "场馆信息"},
     },
     {
       path: 'site',
@@ -17,8 +17,8 @@ export const Venue: RouteRecordRaw = {
       meta: {icon: 'Basketball',title: "场地设置"},
     },
     {
-      path: 'site',
-      component: () => import('@/views/venue/SiteConfig.vue'),
+      path: 'book',
+      component: () => import('@/views/venue/BookConfig.vue'),
       meta: {icon: 'Calendar',title: "预约设置"},
     }
   ]
