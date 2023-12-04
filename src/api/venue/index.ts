@@ -29,3 +29,17 @@ export function saasUpdateSite(data:any)  {
         data,
     })
 }
+export function saasAddSite(data:any)  {
+    return r.request<string[]>({//r.request会做拦截，因此响应的数据就是string[] 类型
+        url: '/saas/add/site',
+        method: 'post',
+        data,
+    })
+}
+export function SaasDelSite(data:any)  {
+    return r.request<string[]>({//r.request会做拦截，因此响应的数据就是string[] 类型
+        url: '/saas/del/site',
+        method: 'post',
+        data,
+    })
+}

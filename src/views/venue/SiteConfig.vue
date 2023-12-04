@@ -1,8 +1,7 @@
 <template>
   <div class="site_main">
     <div>
-      <el-button type="primary" :icon="Plus">新增场地</el-button>
-      <el-button type="primary" :icon="Plus">新增时间段</el-button>
+      <el-button type="primary" :icon="Plus" @click="createSite()">新增场地</el-button>
     </div>
     <div class="hr"></div>
 
@@ -71,7 +70,7 @@
     </el-table>
   </div>
 
-  <el-dialog v-model="dialogFormVisible" title="操作" width="30%">
+  <el-dialog v-model="dialogFormVisible" :title="func=='create'?'创建场地':'更新场地'" width="30%">
     <el-form :model="form">
       <el-form-item label="场地名称" :label-width="formLabelWidth">
         <el-input v-model="form.name"/>
@@ -146,6 +145,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button @click="delSite()" type="danger">删除</el-button>
         <el-button type="primary" @click="submitForm()">
           提交
         </el-button>
@@ -155,17 +155,18 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref, watch} from 'vue'
-import {Plus, Delete} from '@element-plus/icons-vue'
-import {saasGetSiteList, saasUpdateSite} from "@/api/venue";
+import {onMounted, ref} from 'vue'
+import {Plus} from '@element-plus/icons-vue'
+import {saasAddSite, SaasDelSite, saasGetSiteList, saasUpdateSite} from "@/api/venue";
 import {useEnumStore} from "@/stores/enum.ts";
-import {ElMessage} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
 
 
 const tableData = ref<any[]>([])
 const TimeEnum = useEnumStore()
 let dialogFormVisible = ref<boolean>(false)
 let formLabelWidth = '150px'
+let func = ''
 
 
 let form = ref<any>({
@@ -184,34 +185,87 @@ function submitForm() {
   dialogFormVisible.value = false
   form.value.free_price = form.value.free_price * 100
   form.value.busy_price = form.value.busy_price * 100
-  console.log("准备提交的数据", form)
 
-  saasUpdateSite(form.value).then((res: any) => {
-    if (res.data.code == 200) {
-      ElMessage({
-        type: 'success',
-        message: '操作成功'
+  if (func == 'update') {
+    saasUpdateSite(form.value).then((res: any) => {
+      if (res.data.code == 200) {
+        ElMessage({
+          type: 'success',
+          message: '操作成功'
+        })
+      }
+    })
+    location.reload()
+  }
+  if (func == 'create') {
+    console.log(form.value)
+    form.value.shop_id = 1
+    saasAddSite(form.value).then((res: any) => {
+      if (res.data.code == 200) {
+        ElMessage({
+          type: 'success',
+          message: '操作成功'
+        })
+        // location.reload()
+      }
+    })
+  }
+}
+
+function delSite() {
+  ElMessageBox.confirm(
+      '你确定要删除吗？',
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+  )
+      .then(() => {
+        SaasDelSite({site_id: form.value.id}).then((res: any) => {
+          console.log(res)
+          if (res.data.code == 200) {
+            location.reload()
+            ElMessage({
+                  type: 'success',
+                  message: '删除成功',
+                }
+            )
+          }
+        })
+
       })
-    }
-    console.log(res)
-  })
-  location.reload()
+  // .catch(() => {
+  //   ElMessage({
+  //     type: 'info',
+  //     message: 'Delete canceled',
+  //   })
+  // })
 }
 
 function getWorkTime(data: any) {
   return data.site_start_time + " ~ " + data.site_end_time
 }
 
+function createSite() {
+  func = "create"
+  dialogFormVisible.value = true
+  form = ref<any>({})
+  console.log("我看看清空了没", form)
+}
+
 function getBusyTime(data: any) {
   return data.busy_start_time + " ~ " + data.busy_end_time
 }
 
-function siteStartTimeChange(){
+function siteStartTimeChange() {
   console.log("出发了特定的函数")
   form.value.site_end_time = ''
 }
-function edit(data: any) {
 
+function edit(data: any) {
+  func = "update"
   dialogFormVisible.value = true
   let copyObj1 = copyObj(data);
   form.value = copyObj1
