@@ -20,7 +20,7 @@ interface appStore {
 
 const initTabs: Tab[] = [{
   title: '首页',
-  path: '/dashboard',
+  path: '/datecenter/business',
   closable: false,
 }]
 

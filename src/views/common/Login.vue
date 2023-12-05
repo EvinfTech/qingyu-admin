@@ -4,8 +4,6 @@ import { appName, version } from '@/config/app'
 import { useUserStore } from '@/stores/user'
 import { User as UserType } from '@/stores/type'
 import { reactive, ref } from 'vue'
-import { commonGetEnum } from '@/api/common'
-import { useEnumStore } from '@/stores/enum.ts'
 
 enum PasswordType {
   Password = 'password',
@@ -18,7 +16,6 @@ const userStore = useUserStore()
 const form = reactive({ name: '', password: '' })
 
 const passwordType = ref<PasswordType>(PasswordType.Password)
-const commonEnum = useEnumStore()
 
 const passwordTypeChange = () => {
   passwordType.value =
@@ -28,10 +25,6 @@ const passwordTypeChange = () => {
 }
 
 const login = () => {
-  commonGetEnum().then((res) => {
-    console.log('获取全局枚举成功', res.data.data)
-    commonEnum.updateUserInfo(res.data.data)
-  })
   let user: UserType = { name: 'Admin', token: 'xxxxxxx' }
   userStore.updateUserInfo(user)
   router.push('/')

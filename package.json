@@ -13,6 +13,7 @@
     "@types/good-storage": "^1.1.0",
     "@vueuse/core": "^8.7.5",
     "axios": "^1.4.0",
+    "echarts": "^5.4.3",
     "element-plus": "^2.3.6",
     "good-storage": "^1.1.1",
     "jsoneditor": "^9.9.0",
