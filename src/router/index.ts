@@ -1,17 +1,18 @@
 import {Common} from "./modules/common"
 import {Site} from "./modules/site"
 import {Order} from "./modules/order"
+import {System} from "./modules/system"
 import {createRouter, createWebHashHistory, RouteRecordRaw} from 'vue-router'
 import { Venue } from "./modules/venue"
 import { DateCenter } from "./modules/datecenter"
 
 //这里可以根据权限做动态路由
 const menuRoute: RouteRecordRaw[] = [
-  // System,
   Site,
   Order,
   DateCenter,
   Venue,
+  System,
 ]
 
 

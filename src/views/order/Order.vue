@@ -2,7 +2,6 @@
 import { Timer } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Search } from '@element-plus/icons-vue'
 
 const router = useRouter()
 

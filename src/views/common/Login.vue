@@ -4,6 +4,8 @@ import { appName, version } from '@/config/app'
 import { useUserStore } from '@/stores/user'
 import { User as UserType } from '@/stores/type'
 import { reactive, ref } from 'vue'
+import { saasLogin } from '@/api/common'
+import { ElMessage } from 'element-plus'
 
 enum PasswordType {
   Password = 'password',
@@ -25,9 +27,16 @@ const passwordTypeChange = () => {
 }
 
 const login = () => {
-  let user: UserType = { name: 'Admin', token: 'xxxxxxx' }
-  userStore.updateUserInfo(user)
-  router.push('/')
+  let loginInfo = { name: form.name, password: form.password }
+  saasLogin(loginInfo)
+    .then(() => {
+      let user: UserType = { name: form.name, token: 'xxxxxxx' }
+      userStore.updateUserInfo(user)
+      router.push('/')
+    })
+    .catch(() => {
+      ElMessage('用户名或密码错误')
+    })
 }
 </script>
 

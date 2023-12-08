@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
+    "@iconify/iconify": "^3.1.1",
+    "@iconify/vue": "^4.1.1",
     "@types/good-storage": "^1.1.0",
     "@vueuse/core": "^8.7.5",
     "axios": "^1.4.0",
@@ -21,11 +23,13 @@
     "nprogress": "^0.2.0",
     "pinia": "^2.1.4",
     "pinia-plugin-persistedstate": "^3.2.0",
-    "vue": "^3.2.45",
-    "vue-router": "^4.2.5"
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.5",
+    "vue-types": "^5.1.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.1.0",
+    "less": "^4.2.0",
     "sass": "^1.53.0",
     "typescript": "^5.0.2",
     "vite": "^4.3.9",

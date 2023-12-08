@@ -2,6 +2,7 @@ import App from './App.vue'
 import {createApp} from 'vue'
 import {createPinia} from "pinia"
 import 'element-plus/dist/index.css'
+import '@/styles/index.css'
 import ElementPlus from 'element-plus'
 import Router from "@/router/index"
 import 'element-plus/theme-chalk/dark/css-vars.css'
