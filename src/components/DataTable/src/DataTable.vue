@@ -13,7 +13,6 @@
       <div class="opt-box-left">
         <el-button
           v-if="add.enable"
-          v-permission="add?.permission"
           type="primary"
           icon="Plus"
           @click="onAdd"
@@ -22,7 +21,6 @@
         >
         <el-button
           v-if="edit.enable"
-          v-permission="edit?.permission"
           type="success"
           icon="Edit"
           class="filter-item"
@@ -32,7 +30,6 @@
         >
         <el-button
           v-if="del.enable"
-          v-permission="del.permission"
           type="danger"
           icon="Delete"
           class="filter-item"
@@ -42,14 +39,12 @@
         >
         <el-button
           class="filter-item"
-          v-permission="ip.permission"
           v-if="ip && ip.enable"
           type="default"
           icon="Upload"
           >导入</el-button
         >
         <el-button
-          v-permission="op.permission"
           v-if="op && op.enable"
           type="default"
           icon="Download"
@@ -112,7 +107,7 @@
 import { onMounted, toRefs, PropType, ref, unref } from 'vue'
 import { OptionsType, BatchType, TableQueryType } from './types'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { listRoleApi } from '@/api/sys/role'
+import { getRoleList, deleteRole } from '@/api/sys/role'
 
 // 页面参数
 const current = ref(1)
@@ -200,22 +195,15 @@ const onDelete = () => {
     type: 'warning',
   }).then(() => {
     emit('onDelete', unref(selectedIds))
-
-    // 执行删除操作
-    // request
-    //   .post({
-    //     url: delUrl?.value,
-    //     data: { ids: selectedIds.value }
-    //   })
-    //   .then(() => {
-    //     ElMessage({
-    //       showClose: true,
-    //       message: '删除成功！',
-    //       type: 'success'
-    //     })
-    //     // 刷新数据
-    //     loadData()
-    //   })
+    deleteRole({ role_id: selectedIds.value[0] }).then(() => {
+      ElMessage({
+        showClose: true,
+        message: '删除成功！',
+        type: 'success',
+      })
+      // 刷新数据
+      loadData()
+    })
   })
 }
 
@@ -273,8 +261,8 @@ const reload = () => {
 
 // 加载数据
 const loadData = () => {
-  listRoleApi().then((res: any) => {
-    records.value = res.data.data.records
+  getRoleList().then((res: any) => {
+    records.value = res.data.data
   })
   // 请求服务器
   // request

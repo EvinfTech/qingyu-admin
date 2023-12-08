@@ -1,31 +1,31 @@
 import request from "@/utils/request.ts"
 
-export const pagingApi = (data?: any) => {
+export const addRole = (data?: any) => {
   return request.request<string[]>({
-    url: '/api/sys/role/paging',
+    url: '/saas/add/role',
     method: 'post',
     data
   })
 }
 
-export const saveApi = (data: any) => {
+export const deleteRole = (data: any) => {
   return request.request<string[]>({
-    url: '/api/sys/role/save',
+    url: '/saas/del/role',
     method: 'post',
     data
   })
 }
 
-export const listRoleApi = () => {
+export const getRoleList = () => {
   return request.request<string[]>({
     url: '/saas/get/role/list',
     method: 'post',
   })
 }
 
-export const saveRoleApi = (data: any) => {
+export const updateRole = (data: any) => {
   return request.request<string[]>({
-    url: '/api/sys/role/save-menus',
+    url: '/saas/role/update',
     method: 'post',
     data
   })

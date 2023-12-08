@@ -11,20 +11,16 @@
         <el-input
           class="filter-item"
           clearable
-          v-model="query.params['roleName']"
+          v-model="query.params['role_name']"
           placeholder="搜索角色名称"
         />
       </template>
 
       <template #columns>
         <el-table-column type="selection" width="50px" />
-
-        <el-table-column prop="roleName" label="角色名称" />
-
-        <el-table-column prop="roleLevel" label="角色级别" />
-
+        <el-table-column prop="role_name" label="角色名称" />
+        <el-table-column prop="level" label="角色级别" />
         <el-table-column prop="dataScope_dictText" label="数据权限" />
-
         <el-table-column label="操作" width="180px" :align="'center'">
           <template #default="scope">
             <el-button
@@ -46,20 +42,20 @@
       :before-close="handleClose"
     >
       <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
-        <el-form-item label="角色名称" prop="roleName">
-          <el-input v-model="form.roleName" autocomplete="off" />
+        <el-form-item label="角色名称" prop="role_name">
+          <el-input v-model="form.role_name" autocomplete="off" />
         </el-form-item>
 
         <!-- <el-form-item label="数据权限" prop="dataScope">
           <DictListSelect dic-code="data_scope" v-model="form.dataScope" />
         </el-form-item> -->
 
-        <el-form-item label="角色级别" prop="roleLevel">
+        <el-form-item label="角色级别" prop="level">
           <el-input-number
-            v-model="form.roleLevel"
+            v-model="form.level"
             autocomplete="off"
             :min="0"
-            :max="999"
+            :max="20"
           />
           <div>
             <small
@@ -95,7 +91,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 // import DictListSelect from '@/components/DictListSelect/src/DictListSelect.vue'
 import type { RoleDataType } from './types'
 import { ElMessage } from 'element-plus'
-import { saveApi } from '@/api/sys/role'
+import { addRole, updateRole } from '@/api/sys/role'
 import Grant from './components/Grant.vue'
 
 // 表格查询参数
@@ -113,15 +109,15 @@ let options = ref<OptionsType>({
   delUrl: '/saas/del/role',
   add: {
     enable: true,
-    permission: ['role:add'],
+    // permission: ['role:add'],
   },
   edit: {
     enable: true,
-    permission: ['role:edit'],
+    // permission: ['role:edit'],
   },
   del: {
     enable: true,
-    permission: ['role:delete'],
+    // permission: ['role:delete'],
   },
 
   // 批量操作
@@ -191,16 +187,31 @@ const handleSave = (formEl: FormInstance | undefined) => {
   formEl.validate((valid) => {
     if (valid) {
       const formData = unref(form)
-      saveApi(formData).then(() => {
-        ElMessage({
-          showClose: true,
-          message: '操作成功！',
-          type: 'success',
+      console.log('formData', formData)
+      if (formData.id) {
+        //修改
+        updateRole(formData).then(() => {
+          ElMessage({
+            showClose: true,
+            message: '操作成功！',
+            type: 'success',
+          })
+          // 刷新表格
+          tableRef.value.reload()
+          dialogVisible.value = false
         })
-        // 刷新表格
-        tableRef.value.reload()
-        dialogVisible.value = false
-      })
+      } else {
+        addRole(formData).then(() => {
+          ElMessage({
+            showClose: true,
+            message: '操作成功！',
+            type: 'success',
+          })
+          // 刷新表格
+          tableRef.value.reload()
+          dialogVisible.value = false
+        })
+      }
     } else {
       dialogVisible.value = false
     }

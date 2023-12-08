@@ -34,7 +34,7 @@ import { ContentWrap } from '@/components/ContentWrap'
 import { ref, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { treeApi } from '@/api/sys/menu'
-import { listMenuApi, saveRoleApi } from '@/api/sys/role'
+import { listMenuApi } from '@/api/sys/role'
 import { ElTree } from 'element-plus'
 
 const treeRef = ref<InstanceType<typeof ElTree>>()

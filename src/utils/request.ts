@@ -32,7 +32,8 @@ export class Request {
           }else {
             config.headers.Authorization = getToken()
           }
-          if (config.isFormRequest){config.transformRequest = toFormData}
+          if (config.isFormRequest){
+            config.transformRequest = toFormData}
           if(!config.closeLoading){
             //Loading
           }
@@ -82,6 +83,3 @@ export class Request {
 }
 
 export  default new Request({baseURL,timeout})
-
-
-

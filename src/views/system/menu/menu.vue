@@ -33,8 +33,8 @@
 
     <div class="header-box" ref="treeHeader">
       <div class="tree-header" style="flex-grow: 1">菜单名称</div>
-      <div class="tree-header" :style="calcWidth(0, true)">菜单类型</div>
-      <div class="tree-header" :style="calcWidth(1, false)">权限标识</div>
+      <div class="tree-header" :style="calcWidth(0, true)">父级名称</div>
+      <div class="tree-header" :style="calcWidth(1, false)">菜单标题</div>
       <div class="tree-header" :style="calcWidth(2, false)">菜单路由</div>
       <div class="tree-header" :style="calcWidth(3, false)">视图组件</div>
       <div class="tree-header" :style="calcWidth(4, true)">可见状态</div>
@@ -63,10 +63,10 @@
             <span>&nbsp;{{ data.name }}</span>
           </div>
           <div class="tree-item" :style="calcWidth(0, true)">
-            <span>{{ data.menuType_dictText }}</span>
+            <span>{{ data.pName }}</span>
           </div>
           <div class="tree-item" :style="calcWidth(1, false)">
-            <span>{{ data.permissionTag }}</span>
+            <span>{{ data.title }}</span>
           </div>
 
           <div class="tree-item" :style="calcWidth(2, false)">
@@ -78,7 +78,7 @@
           </div>
 
           <div class="tree-item" :style="calcWidth(4, true)">
-            <el-tag type="success" v-if="!data.hidden">显示</el-tag>
+            <el-tag type="success" v-if="data.hidden == 1">显示</el-tag>
             <el-tag type="info" v-else>隐藏</el-tag>
           </div>
 
@@ -119,59 +119,29 @@
       :before-close="handleClose"
     >
       <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
-        <el-form-item label="类型" prop="menuType">
-          <div class="flex items-center">
-            <el-radio-group v-model="form.menuType">
-              <el-radio :label="1" :disabled="menuType === 2">目录</el-radio>
-              <el-radio
-                :label="2"
-                :disabled="menuType === 2 || form.parentId === '0'"
-                >菜单</el-radio
-              >
-              <el-radio :label="3" :disabled="menuType !== 2">功能</el-radio>
-            </el-radio-group>
-          </div>
+        <el-form-item label="菜单名称" prop="title">
+          <el-input v-model="form.title" autocomplete="off" />
         </el-form-item>
 
-        <el-form-item label="名称" prop="metaTitle">
-          <el-input v-model="form.metaTitle" autocomplete="off" />
-        </el-form-item>
-
-        <el-form-item v-if="form.menuType === 2" label="英文名" prop="name">
+        <el-form-item label="英文名" prop="name">
           <el-input v-model="form.name" autocomplete="off" />
         </el-form-item>
 
-        <el-form-item
-          v-if="form.menuType === 2"
-          label="视图组件"
-          prop="component"
-        >
-          <el-input v-model="form.component" autocomplete="off" />
+        <el-form-item label="等级" prop="grade">
+          <el-input-number v-model="form.grade" :min="1" :max="10" />
         </el-form-item>
 
-        <el-form-item
-          v-if="form.menuType === 1 || form.menuType === 2"
-          label="路由路径"
-          prop="path"
-        >
+        <el-form-item label="路由路径" prop="path">
           <el-input v-model="form.path" autocomplete="off" />
         </el-form-item>
 
-        <el-form-item
-          v-if="form.menuType === 3"
-          label="权限标识"
-          prop="permissionTag"
-        >
-          <el-input v-model="form.permissionTag" autocomplete="off" />
+        <el-form-item label="视图路径" prop="component">
+          <el-input v-model="form.component" autocomplete="off" />
         </el-form-item>
 
-        <el-form-item
-          v-if="form.menuType === 1 || form.menuType === 2"
-          label="图标"
-          prop="metaIcon"
-        >
+        <el-form-item label="图标" prop="icon">
           <el-input
-            v-model="form.metaIcon"
+            v-model="form.icon"
             autocomplete="off"
             placeholder="填写图标名称如: carbon:settings,请在以下链接查找"
           />
@@ -182,11 +152,7 @@
           </small>
         </el-form-item>
 
-        <el-form-item
-          v-if="form.menuType === 1 || form.menuType === 2"
-          label="是否隐藏"
-          prop="hidden"
-        >
+        <el-form-item label="是否隐藏" prop="hidden">
           <el-switch
             v-model="form.hidden"
             inline-prompt
@@ -215,7 +181,7 @@
 <script lang="ts" setup>
 import { ContentWrap } from '@/components/ContentWrap'
 import { onMounted, reactive, ref } from 'vue'
-import { treeApi, saveApi, deleteApi, detailApi, sortApi } from '@/api/sys/menu'
+import { getMenuList, addMenu, updateMenu, deleteMenu } from '@/api/sys/menu'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessageBox, ElMessage, ElTree } from 'element-plus'
 import type { MenuDataType } from './menu'
@@ -232,7 +198,7 @@ const filterText = ref('')
 // 加载数据
 const loadData = () => {
   loading.value = true
-  treeApi()
+  getMenuList()
     .then((res: any) => {
       console.log(res, '菜单信息')
       records.value = res.data.data
@@ -248,23 +214,16 @@ const menuType = ref(1)
 const form = ref<MenuDataType>({})
 const formRef = ref<FormInstance>()
 const rules = reactive<FormRules>({
-  menuType: [
+  title: [
     {
       required: true,
-      message: '请选择菜单类型',
-      trigger: 'blur',
-    },
-  ],
-  metaTitle: [
-    {
-      required: true,
-      message: '请输入标题',
+      message: '请输入菜单名称',
       trigger: 'blur',
     },
   ],
   name: [
     {
-      // required: true,
+      required: true,
       message: '请输入菜单英文名称！',
       trigger: 'blur',
     },
@@ -272,22 +231,15 @@ const rules = reactive<FormRules>({
 
   component: [
     {
-      // required: true,
+      required: true,
       message: '请输入视图路径',
       trigger: 'blur',
     },
   ],
   path: [
     {
-      // required: true,
+      required: true,
       message: '请输入访问路径',
-      trigger: 'blur',
-    },
-  ],
-  permissionTag: [
-    {
-      // required: true,
-      message: '请输入权限标识',
       trigger: 'blur',
     },
   ],
@@ -300,10 +252,9 @@ const handleAddRoot = (formEl: FormInstance | undefined) => {
   formEl?.resetFields()
 
   // 清空值
-  form.value = {
-    menuType: 1,
-    parentId: '0',
-  }
+  // form.value = {
+  //   pId: '0',
+  // }
   dialogVisible.value = true
 }
 
@@ -315,14 +266,7 @@ const handleAdd = (row: any, formEl: FormInstance | undefined) => {
   formEl?.resetFields()
   form.value = {}
 
-  if (menuType.value === 1) {
-    form.value.menuType = 1
-  }
-  if (menuType.value === 2) {
-    form.value.menuType = 3
-  }
-
-  form.value.parentId = row.id
+  form.value.pid = row.id
   dialogVisible.value = true
 }
 
@@ -330,11 +274,6 @@ const handleAdd = (row: any, formEl: FormInstance | undefined) => {
 const handleEdit = (row: any) => {
   form.value = row
   dialogVisible.value = true
-
-  // detailApi({ id: row.id }).then((res) => {
-  //   form.value = res.data
-  //   dialogVisible.value = true
-  // })
 }
 
 const handleClose = () => {
@@ -358,13 +297,14 @@ const calcWidth = (index: number, center: boolean) => {
 }
 
 // 删除数据
-const handleDelete = (ids: any[]) => {
+const handleDelete = (id: number) => {
   ElMessageBox.confirm('确实要删除吗?', '提示信息', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-    deleteApi({ ids: ids }).then(() => {
+    console.log('ids', id)
+    deleteMenu({ id: id }).then(() => {
       ElMessage({
         showClose: true,
         message: '删除成功！',
@@ -385,44 +325,59 @@ const handleSave = (formEl: FormInstance | undefined) => {
       return
     }
 
-    // 功能自动隐藏
-    if (form.value.menuType === 3) {
-      form.value.hidden = true
-    }
+    form.value.hidden = form.value.hidden ? 1 : 0
+    if (form.value.id == '0') {
+      // 新增
+      addMenu(form.value).then(() => {
+        dialogVisible.value = false
+        ElMessage({
+          showClose: true,
+          message: '新增成功！',
+          type: 'success',
+        })
 
-    console.log('新增菜单', form.value)
-
-    var tmp = {
-      name: form.value.metaTitle,
-      // grade: Number(form.value.parentId),
-      grade: 1,
-    }
-
-    saveApi(tmp).then(() => {
-      dialogVisible.value = false
-
-      ElMessage({
-        showClose: true,
-        message: '保存成功！',
-        type: 'success',
+        // 刷新页面
+        loadData()
       })
+    } else {
+      //修改
+      updateMenu(form.value).then(() => {
+        dialogVisible.value = false
+        ElMessage({
+          showClose: true,
+          message: '修改成功',
+          type: 'success',
+        })
 
-      // 刷新页面
-      loadData()
-    })
+        // 刷新页面
+        loadData()
+      })
+    }
   })
 }
 
-// 批量删除
+// 删除
 const batchDelete = () => {
-  const ids = treeRef.value!.getCheckedKeys(false)
-  handleDelete(ids)
+  // const ids = treeRef.value!.getCheckedKeys(false)
+  const row = treeRef.value!.getCurrentNode()
+
+  if (row) handleDelete(row.id)
+  else
+    ElMessage({
+      duration: 1000,
+      message: '请选择要删除的菜单',
+    })
 }
 
-// 批量删除
+// 修改
 const batchEdit = () => {
   const row = treeRef.value!.getCurrentNode()
-  handleEdit(row)
+  if (row) handleEdit(row)
+  else
+    ElMessage({
+      duration: 1000,
+      message: '请选择要修改的菜单',
+    })
 }
 
 const allowDrop = (draggingNode: Node, dropNode: Node, type: AllowDropType) => {
