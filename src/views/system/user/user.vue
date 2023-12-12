@@ -12,15 +12,20 @@
           class="filter-item"
           clearable
           v-model="query.params['role_name']"
-          placeholder="搜索角色名称"
+          placeholder="搜索用户名称"
         />
       </template>
 
       <template #columns>
         <el-table-column type="selection" width="50px" />
-        <el-table-column prop="role_name" label="角色名称" />
+        <el-table-column prop="role_name" label="用户名" />
+        <el-table-column prop="role_name" label="性别" />
+        <el-table-column prop="role_name" label="出生年月" />
+        <el-table-column prop="role_name" label="角色" />
+        <el-table-column prop="role_name" label="注册时间" />
+        <el-table-column prop="role_name" label="用户名" />
+        <el-table-column prop="role_name" label="用户名" />
         <el-table-column prop="level" label="角色级别" />
-        <el-table-column prop="dataScope_dictText" label="数据权限" />
         <el-table-column label="操作" width="180px" :align="'center'">
           <template #default="scope">
             <el-button
@@ -74,8 +79,6 @@
         </span>
       </template>
     </el-dialog>
-
-    <Grant :role-id="grantRoleId" v-model="grantVisible" />
   </ContentWrap>
 </template>
 
@@ -92,7 +95,6 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { RoleDataType } from './types'
 import { ElMessage } from 'element-plus'
 import { addRole, updateRole } from '@/api/sys/role'
-import Grant from './components/Grant.vue'
 
 // 表格查询参数
 let query = ref<TableQueryType>({

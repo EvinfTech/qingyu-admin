@@ -52,7 +52,7 @@
           >导出</el-button
         >
 
-        <el-dropdown
+        <!-- <el-dropdown
           v-if="selectedIds.length > 0 && batch"
           style="margin-left: 10px"
         >
@@ -69,7 +69,7 @@
               >
             </el-dropdown-menu>
           </template>
-        </el-dropdown>
+        </el-dropdown> -->
       </div>
 
       <div class="opt-box-right">
@@ -263,6 +263,9 @@ const reload = () => {
 const loadData = () => {
   getRoleList().then((res: any) => {
     records.value = res.data.data
+    current.value = query.value.current
+    total.value = res.data.data.length
+    loading.value = false
   })
   // 请求服务器
   // request
@@ -280,7 +283,7 @@ const loadData = () => {
 }
 
 // 修改每页数量
-const sizeChange = (size) => {
+const sizeChange = (size: any) => {
   // 清空值并搜索
   query.value.current = 1
   query.value.size = size
@@ -289,7 +292,7 @@ const sizeChange = (size) => {
 }
 
 // 修改每页数量
-const currentChange = (current) => {
+const currentChange = (current: any) => {
   // 跳页即可
   query.value.current = current
   // 加载数据

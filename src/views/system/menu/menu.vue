@@ -32,9 +32,9 @@
     </div>
 
     <div class="header-box" ref="treeHeader">
-      <div class="tree-header" style="flex-grow: 1">菜单名称</div>
+      <div class="tree-header" style="flex-grow: 1">菜单标题</div>
       <div class="tree-header" :style="calcWidth(0, true)">父级名称</div>
-      <div class="tree-header" :style="calcWidth(1, false)">菜单标题</div>
+      <div class="tree-header" :style="calcWidth(1, false)">菜单名称</div>
       <div class="tree-header" :style="calcWidth(2, false)">菜单路由</div>
       <div class="tree-header" :style="calcWidth(3, false)">视图组件</div>
       <div class="tree-header" :style="calcWidth(4, true)">可见状态</div>
@@ -60,13 +60,13 @@
           <div class="tree-item" style="flex-grow: 1">
             <!-- <Icon v-if="data.metaIcon" :icon="data.metaIcon" /> -->
             <!-- <span>&nbsp;{{ data.metaTitle }}</span> -->
-            <span>&nbsp;{{ data.name }}</span>
+            <span>&nbsp;{{ data.title }}</span>
           </div>
           <div class="tree-item" :style="calcWidth(0, true)">
             <span>{{ data.pName }}</span>
           </div>
           <div class="tree-item" :style="calcWidth(1, false)">
-            <span>{{ data.title }}</span>
+            <span>{{ data.name }}</span>
           </div>
 
           <div class="tree-item" :style="calcWidth(2, false)">
@@ -135,6 +135,17 @@
           <el-input v-model="form.path" autocomplete="off" />
         </el-form-item>
 
+        <el-form-item label="上级菜单" prop="pid">
+          <el-select v-model="form.pid" clearable placeholder="可选择上级菜单">
+            <el-option
+              v-for="item in records"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="视图路径" prop="component">
           <el-input v-model="form.component" autocomplete="off" />
         </el-form-item>
@@ -189,7 +200,7 @@ import type Node from 'element-plus/es/components/tree/src/model/node'
 import type { AllowDropType } from 'element-plus/es/components/tree/src/tree.type'
 
 // 页面参数
-const records = ref([])
+const records = ref([] as any)
 const loading = ref(false)
 
 // 菜单搜索
@@ -325,14 +336,16 @@ const handleSave = (formEl: FormInstance | undefined) => {
       return
     }
 
+    console.log('form.value.id', form.value.id)
+
     form.value.hidden = form.value.hidden ? 1 : 0
-    if (form.value.id == '0') {
-      // 新增
-      addMenu(form.value).then(() => {
+    if (form.value.id) {
+      //修改
+      updateMenu(form.value).then(() => {
         dialogVisible.value = false
         ElMessage({
           showClose: true,
-          message: '新增成功！',
+          message: '修改成功',
           type: 'success',
         })
 
@@ -340,12 +353,12 @@ const handleSave = (formEl: FormInstance | undefined) => {
         loadData()
       })
     } else {
-      //修改
-      updateMenu(form.value).then(() => {
+      // 新增
+      addMenu(form.value).then(() => {
         dialogVisible.value = false
         ElMessage({
           showClose: true,
-          message: '修改成功',
+          message: '新增成功！',
           type: 'success',
         })
 

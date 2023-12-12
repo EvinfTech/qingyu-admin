@@ -6,13 +6,18 @@
     @change="selectChange"
     style="width: 100%"
   >
-    <el-option v-for="item in options" :key="item.id" :label="item.roleName" :value="item.id" />
+    <el-option
+      v-for="item in options"
+      :key="item.id"
+      :label="item.role_name"
+      :value="item.id"
+    />
   </el-select>
 </template>
 
 <script lang="ts" setup>
 import { PropType, ref, watch, onMounted, unref } from 'vue'
-import { pagingApi } from '@/api/sys/role'
+import { getMenuByRoleId } from '@/api/sys/role'
 import type { RoleDataType } from '../types'
 
 const value = ref<String[]>([])
@@ -22,12 +27,12 @@ const options = ref<RoleDataType[]>([])
 const props = defineProps({
   modelValue: {
     type: Array as PropType<string[]>,
-    default: () => []
+    default: () => [],
   },
   title: {
     type: String,
-    default: '请选择数据'
-  }
+    default: '请选择数据',
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -43,7 +48,7 @@ watch(
 // 加载数据
 const loadData = async () => {
   // 加载下拉列表
-  await pagingApi({ current: 1, size: 100, params: {} }).then((res) => {
+  await getMenuByRoleId({ role_id: 5 }).then((res: any) => {
     options.value = res.data.records
   })
 }

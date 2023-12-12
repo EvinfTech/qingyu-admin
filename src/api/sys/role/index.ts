@@ -25,7 +25,25 @@ export const getRoleList = () => {
 
 export const updateRole = (data: any) => {
   return request.request<string[]>({
-    url: '/saas/role/update',
+    url: '/saas/update/role',
+    method: 'post',
+    data
+  })
+}
+
+
+// 更新角色的菜单权限
+export const updateMenuRole = (data: any) => {
+  return request.request<string[]>({
+    url: '/saas/update/menuRole',
+    method: 'post',
+    data
+  })
+}
+
+export const getMenuByRoleId = (data: any) => {
+  return request.request<string[]>({
+    url: '/saas/get/menuRole/list',
     method: 'post',
     data
   })

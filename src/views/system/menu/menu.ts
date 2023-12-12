@@ -1,7 +1,7 @@
 // 菜单实体对象
 export type MenuDataType = {
-  id?: string
-  pid?: string
+  id?: Number
+  pid?: Number
   name?: string         // 英文名称
   title?: string        // 中文标题
   p_name?: string
