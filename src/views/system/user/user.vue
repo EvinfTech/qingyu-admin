@@ -24,7 +24,7 @@
         <el-table-column prop="role_name" label="角色" />
         <el-table-column prop="role_name" label="注册时间" />
         <el-table-column prop="role_name" label="用户名" />
-        <el-table-column prop="role_name" label="用户名" />
+        <el-table-column prop="role_name" label="用户名" />5
         <el-table-column prop="level" label="角色级别" />
         <el-table-column label="操作" width="180px" :align="'center'">
           <template #default="scope">
@@ -95,6 +95,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { RoleDataType } from './types'
 import { ElMessage } from 'element-plus'
 import { addRole, updateRole } from '@/api/sys/role'
+import { getUserList } from '@/api/sys/user'
 
 // 表格查询参数
 let query = ref<TableQueryType>({
@@ -107,7 +108,7 @@ let query = ref<TableQueryType>({
 
 // 表格默认参数
 let options = ref<OptionsType>({
-  listUrl: '/saas/get/role/list',
+  listUrl: '/saas/get/user/list',
   delUrl: '/saas/del/role',
   add: {
     enable: true,
