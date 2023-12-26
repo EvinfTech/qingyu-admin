@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import { onMounted, toRefs, PropType, ref, unref, watch } from 'vue'
+
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+const order = ref()
+
 interface Goods {
   id: string
   datetime: Date
@@ -19,19 +27,24 @@ const tableData: Goods[] = [
     state: '正常',
   },
 ]
+
+onMounted(() => {
+  order.value = JSON.parse(route.query.order as string)
+  console.log('订单信息', order.value)
+})
 </script>
 
 <template>
   <div class="detail_main">
     <p class="detail_title">
-      <span>订单编号：20230808121232323</span>
-      <span>下单时间：2023-08-08 12:11:56</span>
+      <span>订单编号：{{ order?.order_no }}</span>
+      <span>下单时间：{{ order?.gmt_create }}</span>
       <span>预约场地</span>
     </p>
     <div class="detail_step">
       <div class="detail_state">
         <p>买家已下单，待支付</p>
-        <p>应付金额：￥100.00</p>
+        <p>应付金额：￥{{ order?.money }}</p>
         <p>订单需要在2023-08-08 11:11:11前完成支付</p>
         <p>
           <el-button type="warning">确认支付</el-button
@@ -50,12 +63,12 @@ const tableData: Goods[] = [
     <div class="detail_info">
       <div class="detail_info_box">
         <h1>订单信息</h1>
-        <p>订单编号：20230808101022223333</p>
+        <p>订单编号：{{ order?.order_no }}</p>
         <p>订单类型：预约</p>
-        <p>订单来源：小程序</p>
+        <p>订单来源：{{ order?.type }}</p>
         <p>订单状态：待支付</p>
-        <p>下单时间：2023-08-08 12:00:00</p>
-        <p>应付金额：￥100.00</p>
+        <p>下单时间：{{ order?.gmt_create }}</p>
+        <p>应付金额：￥ {{ order?.money }}</p>
       </div>
       <div class="detail_info_box">
         <h1>付款信息</h1>

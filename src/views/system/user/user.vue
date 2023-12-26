@@ -11,21 +11,25 @@
         <el-input
           class="filter-item"
           clearable
-          v-model="query.params['role_name']"
+          v-model="query.params['name']"
           placeholder="搜索用户名称"
         />
       </template>
 
       <template #columns>
         <el-table-column type="selection" width="50px" />
-        <el-table-column prop="role_name" label="用户名" />
-        <el-table-column prop="role_name" label="性别" />
-        <el-table-column prop="role_name" label="出生年月" />
-        <el-table-column prop="role_name" label="角色" />
-        <el-table-column prop="role_name" label="注册时间" />
-        <el-table-column prop="role_name" label="用户名" />
-        <el-table-column prop="role_name" label="用户名" />5
-        <el-table-column prop="level" label="角色级别" />
+        <el-table-column prop="avatar" label="头像">
+          <template #default="scope">
+            <el-avatar :size="50" :src="scope.avatar" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="name" label="用户名" />
+        <el-table-column prop="phone" label="电话" />
+        <el-table-column prop="birthday" label="出生年月" />
+        <el-table-column prop="sex" label="性别" />
+        <el-table-column prop="total_count" label="运动总次数" />
+        <el-table-column prop="total_length" label="运动总时常" />
+        <el-table-column prop="gmt_create" label="创建日期" />5
         <el-table-column label="操作" width="180px" :align="'center'">
           <template #default="scope">
             <el-button
@@ -42,31 +46,17 @@
 
     <el-dialog
       v-model="dialogVisible"
-      title="角色管理"
+      title="修改信息"
       width="30%"
       :before-close="handleClose"
     >
       <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
-        <el-form-item label="角色名称" prop="role_name">
-          <el-input v-model="form.role_name" autocomplete="off" />
+        <el-form-item label="用户名称" prop="name">
+          <el-input v-model="form.name" autocomplete="off" />
         </el-form-item>
 
-        <!-- <el-form-item label="数据权限" prop="dataScope">
-          <DictListSelect dic-code="data_scope" v-model="form.dataScope" />
-        </el-form-item> -->
-
-        <el-form-item label="角色级别" prop="level">
-          <el-input-number
-            v-model="form.level"
-            autocomplete="off"
-            :min="0"
-            :max="20"
-          />
-          <div>
-            <small
-              >数字越大级别越大，数字小的角色不能修改数字高角色的数据</small
-            >
-          </div>
+        <el-form-item label="手机号" prop="phone">
+          <el-input v-model="form.phone" autocomplete="off" />
         </el-form-item>
       </el-form>
 
@@ -95,7 +85,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { RoleDataType } from './types'
 import { ElMessage } from 'element-plus'
 import { addRole, updateRole } from '@/api/sys/role'
-import { getUserList } from '@/api/sys/user'
+import { updateUserInfo } from '@/api/sys/user'
 
 // 表格查询参数
 let query = ref<TableQueryType>({
@@ -193,7 +183,7 @@ const handleSave = (formEl: FormInstance | undefined) => {
       console.log('formData', formData)
       if (formData.id) {
         //修改
-        updateRole(formData).then(() => {
+        updateUserInfo(formData).then(() => {
           ElMessage({
             showClose: true,
             message: '操作成功！',

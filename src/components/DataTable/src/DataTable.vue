@@ -12,7 +12,7 @@
     <div class="opt-box">
       <div class="opt-box-left">
         <el-button
-          v-if="add.enable"
+          v-if="add?.enable"
           type="primary"
           icon="Plus"
           @click="onAdd"
@@ -20,7 +20,7 @@
           >添加</el-button
         >
         <el-button
-          v-if="edit.enable"
+          v-if="edit?.enable"
           type="success"
           icon="Edit"
           class="filter-item"
@@ -29,7 +29,7 @@
           >修改</el-button
         >
         <el-button
-          v-if="del.enable"
+          v-if="del?.enable"
           type="danger"
           icon="Delete"
           class="filter-item"
@@ -103,11 +103,10 @@
 </template>
 
 <script lang="ts" setup>
-// import request from '@/config/axios'
-import { onMounted, toRefs, PropType, ref, unref } from 'vue'
+import { onMounted, toRefs, PropType, ref, unref, watch } from 'vue'
 import { OptionsType, BatchType, TableQueryType } from './types'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { getRoleList, deleteRole } from '@/api/sys/role'
+import request from '@/utils/request'
 
 // 页面参数
 const current = ref(1)
@@ -145,7 +144,7 @@ const { query } = toRefs(props)
 // 搜索数据
 const search = () => {
   // 第一页
-  query.value.current = 1
+  query.value.page = 1
   // 加载数据
   loadData()
 }
@@ -153,7 +152,7 @@ const search = () => {
 // 搜索数据
 const reset = () => {
   // 清空值并搜索
-  query.value.params = {}
+  // query.value.params = {}
   search()
 }
 
@@ -195,15 +194,21 @@ const onDelete = () => {
     type: 'warning',
   }).then(() => {
     emit('onDelete', unref(selectedIds))
-    deleteRole({ role_id: selectedIds.value[0] }).then(() => {
-      ElMessage({
-        showClose: true,
-        message: '删除成功！',
-        type: 'success',
+    request
+      .request<string[]>({
+        url: delUrl?.value,
+        method: 'post',
+        data: { role_id: selectedIds.value[0] },
       })
-      // 刷新数据
-      loadData()
-    })
+      .then(() => {
+        ElMessage({
+          showClose: true,
+          message: '删除成功！',
+          type: 'success',
+        })
+        // 刷新数据
+        loadData()
+      })
   })
 }
 
@@ -239,7 +244,7 @@ const onBatch = (data: BatchType) => {
       //   })
       //   .then(() => {
       //     ElMessage({
-      //       showClose: true,
+      //       showClose: true,z
       //       message: '操作成功！',
       //       type: 'success'
       //     })
@@ -260,42 +265,42 @@ const reload = () => {
 }
 
 // 加载数据
-const loadData = () => {
-  getRoleList().then((res: any) => {
-    records.value = res.data.data
-    current.value = query.value.current
-    total.value = res.data.data.length
-    loading.value = false
-  })
-  // 请求服务器
-  // request
-  //   .post({
-  //     url: listUrl.value,
-  //     data: query.value,
-  //   })
-  //   .then((res) => {
-  //     const data = res.data
-  //     current.value = query.value.current
-  //     records.value = data.records
-  //     total.value = data.total
-  //     loading.value = false
-  //   })
+const loadData = async () => {
+  loading.value = true
+
+  var mergedObj = Object.assign(
+    {},
+    { size: query.value.size, page: query.value.page },
+    query.value.params
+  )
+
+  request
+    .request<string[]>({
+      url: listUrl.value,
+      method: 'post',
+      data: mergedObj,
+    })
+    .then((res: any) => {
+      records.value = res.data.data.list
+      total.value = res.data.data.total
+      current.value = query.value.page
+      loading.value = false
+    })
 }
 
 // 修改每页数量
 const sizeChange = (size: any) => {
   // 清空值并搜索
-  query.value.current = 1
+  query.value.page = 1
   query.value.size = size
   // 加载数据
   loadData()
 }
 
-// 修改每页数量
-const currentChange = (current: any) => {
-  // 跳页即可
-  query.value.current = current
-  // 加载数据
+const currentChange = (count: any) => {
+  // debugger
+  current.value = count
+  query.value.page = count
   loadData()
 }
 

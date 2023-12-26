@@ -1,19 +1,20 @@
 <template>
   <div class="site_main">
     <div>
-      <el-button type="primary" :icon="Plus" @click="createSite()">新增场地</el-button>
+      <el-button type="primary" :icon="Plus" @click="createSite()"
+        >新增场地</el-button
+      >
     </div>
     <div class="hr"></div>
 
     <el-table :data="tableData" stripe style="width: 100%" border>
-      <el-table-column prop="id" label="场地id" width="80"/>
-      <el-table-column prop="name" label="场地名称" width="180"/>
+      <el-table-column prop="id" label="场地id" width="80" />
+      <el-table-column prop="name" label="场地名称" width="180" />
       <el-table-column label="可预约时间" width="180">
         <template #default="scope">
           <div>
             {{ getWorkTime(scope.row) }}
           </div>
-
         </template>
       </el-table-column>
       <el-table-column prop="date" label="忙时时间段" width="180">
@@ -21,102 +22,99 @@
           <div>
             {{ getBusyTime(scope.row) }}
           </div>
-
         </template>
       </el-table-column>
       <el-table-column prop="free_price" label="闲时价格" width="180">
         <template #default="scope">
-          <di>
-            {{ scope.row.free_price / 100 }}元
-          </di>
+          <div>{{ scope.row.free_price / 100 }}元</div>
         </template>
       </el-table-column>
       <el-table-column prop="busy_price" label="忙时价格" width="180">
         <template #default="scope">
-          <di>
-            {{ scope.row.busy_price / 100 }}元
-          </di>
+          <div>{{ scope.row.busy_price / 100 }}元</div>
         </template>
       </el-table-column>
       <el-table-column prop="status" label="状态" width="180">
         <template #default="scope">
-          <di>
-            {{ scope.row.status == "Y" ? "正常" : "不可用" }}
-          </di>
+          <div>
+            {{ scope.row.status == 'Y' ? '正常' : '不可用' }}
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="weekend_busy" label="周末是否为忙时" width="180">
         <template #default="scope">
-          <di>
-            {{ scope.row.weekend_busy == 1 ? "是" : "否" }}
-          </di>
+          <div>
+            {{ scope.row.weekend_busy == 1 ? '是' : '否' }}
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="holiday_busy" label="假期是否为忙时" width="180">
         <template #default="scope">
-          <di>
-            {{ scope.row.holiday_busy == 1 ? "是" : "否" }}
-          </di>
+          <div>
+            {{ scope.row.holiday_busy == 1 ? '是' : '否' }}
+          </div>
         </template>
       </el-table-column>
-      <el-table-column prop="data_busy" label="特殊忙时日期"/>
+      <el-table-column prop="data_busy" label="特殊忙时日期" />
       <el-table-column label="操作" width="120">
         <template #default="scope">
-          <el-button @click="edit(scope.row) ">查看\编辑</el-button>
-
+          <el-button @click="edit(scope.row)">查看\编辑</el-button>
         </template>
-
       </el-table-column>
     </el-table>
   </div>
 
-  <el-dialog v-model="dialogFormVisible" :title="func=='create'?'创建场地':'更新场地'" width="30%">
+  <el-dialog
+    v-model="dialogFormVisible"
+    :title="func == 'create' ? '创建场地' : '更新场地'"
+    width="30%"
+  >
     <el-form :model="form">
       <el-form-item label="场地名称" :label-width="formLabelWidth">
-        <el-input v-model="form.name"/>
+        <el-input v-model="form.name" />
       </el-form-item>
       <el-form-item label="可预约时间" :label-width="formLabelWidth">
         <div class="demo-time-range">
           <el-time-select
-              v-model="form.site_start_time"
-              start="1:00"
-              step="00:30"
-              end="23:30"
-              @change="siteStartTimeChange()"
-              placeholder="Select time"
+            v-model="form.site_start_time"
+            start="1:00"
+            step="00:30"
+            end="23:30"
+            @change="siteStartTimeChange()"
+            placeholder="Select time"
           />
           <el-time-select
-              v-model="form.site_end_time "
-              :start=form.site_start_time
-              step="01:00"
-              end="23:30"
-              placeholder="Select time"
+            v-model="form.site_end_time"
+            :start="form.site_start_time"
+            step="01:00"
+            end="23:30"
+            placeholder="Select time"
           />
         </div>
       </el-form-item>
       <el-form-item label="忙时时间段" :label-width="formLabelWidth">
         <div class="demo-time-range">
           <el-time-select
-              v-model="form.busy_start_time"
-              start="1:00"
-              step="00:30"
-              end="23:30"
-              placeholder="Select time"
+            v-model="form.busy_start_time"
+            start="1:00"
+            step="00:30"
+            end="23:30"
+            placeholder="Select time"
           />
           <el-time-select
-              v-model="form.busy_end_time"
-              start="1:00"
-              step="00:30"
-              end="23:30"
-              placeholder="Select time"
+            v-model="form.busy_end_time"
+            start="1:00"
+            step="00:30"
+            end="23:30"
+            placeholder="Select time"
           />
         </div>
       </el-form-item>
       <el-form-item label="闲时价格" :label-width="formLabelWidth">
-        <el-input v-model="form.free_price"/>
+        <el-input v-model="form.free_price" />
       </el-form-item>
       <el-form-item label="忙时价格" :label-width="formLabelWidth">
-        <el-input v-model="form.busy_price"/>
+        <el-input v-model="form.busy_price" />
       </el-form-item>
       <el-form-item label="状态" :label-width="formLabelWidth">
         <!--        <el-input v-model="form.status"/>-->
@@ -138,29 +136,30 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="特殊忙时日期" :label-width="formLabelWidth">
-        <el-input v-model="form.data_busy"/>
+        <el-input v-model="form.data_busy" />
       </el-form-item>
-
     </el-form>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button @click="delSite()" type="danger">删除</el-button>
-        <el-button type="primary" @click="submitForm()">
-          提交
-        </el-button>
+        <el-button type="primary" @click="submitForm()"> 提交 </el-button>
       </span>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
-import {Plus} from '@element-plus/icons-vue'
-import {saasAddSite, SaasDelSite, saasGetSiteList, saasUpdateSite} from "@/api/venue";
-import {useEnumStore} from "@/stores/enum.ts";
-import {ElMessage, ElMessageBox} from "element-plus";
-
+import { onMounted, ref } from 'vue'
+import { Plus } from '@element-plus/icons-vue'
+import {
+  saasAddSite,
+  SaasDelSite,
+  saasGetSiteList,
+  saasUpdateSite,
+} from '@/api/venue'
+import { useEnumStore } from '@/stores/enum.ts'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const tableData = ref<any[]>([])
 const TimeEnum = useEnumStore()
@@ -168,17 +167,16 @@ let dialogFormVisible = ref<boolean>(false)
 let formLabelWidth = '150px'
 let func = ''
 
-
 let form = ref<any>({
   site_start_time: '',
-  site_end_time: ''
+  site_end_time: '',
 })
 onMounted(() => {
-  saasGetSiteList({"shop_id": 1}).then((res: any) => {
+  saasGetSiteList({ shop_id: 1 }).then((res: any) => {
     tableData.value = res.data.data
-    console.log("表数据", tableData.value)
+    console.log('表数据', tableData.value)
   })
-  console.log("枚举数据", TimeEnum.Enum.time_enum[8])
+  console.log('枚举数据', TimeEnum.Enum.time_enum[8])
 })
 
 function submitForm() {
@@ -191,7 +189,7 @@ function submitForm() {
       if (res.data.code == 200) {
         ElMessage({
           type: 'success',
-          message: '操作成功'
+          message: '操作成功',
         })
       }
     })
@@ -204,7 +202,7 @@ function submitForm() {
       if (res.data.code == 200) {
         ElMessage({
           type: 'success',
-          message: '操作成功'
+          message: '操作成功',
         })
         // location.reload()
       }
@@ -213,29 +211,22 @@ function submitForm() {
 }
 
 function delSite() {
-  ElMessageBox.confirm(
-      '你确定要删除吗？',
-      '提示',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }
-  )
-      .then(() => {
-        SaasDelSite({site_id: form.value.id}).then((res: any) => {
-          console.log(res)
-          if (res.data.code == 200) {
-            location.reload()
-            ElMessage({
-                  type: 'success',
-                  message: '删除成功',
-                }
-            )
-          }
+  ElMessageBox.confirm('你确定要删除吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(() => {
+    SaasDelSite({ site_id: form.value.id }).then((res: any) => {
+      console.log(res)
+      if (res.data.code == 200) {
+        location.reload()
+        ElMessage({
+          type: 'success',
+          message: '删除成功',
         })
-
-      })
+      }
+    })
+  })
   // .catch(() => {
   //   ElMessage({
   //     type: 'info',
@@ -245,29 +236,29 @@ function delSite() {
 }
 
 function getWorkTime(data: any) {
-  return data.site_start_time + " ~ " + data.site_end_time
+  return data.site_start_time + ' ~ ' + data.site_end_time
 }
 
 function createSite() {
-  func = "create"
+  func = 'create'
   dialogFormVisible.value = true
   form = ref<any>({})
-  console.log("我看看清空了没", form)
+  console.log('我看看清空了没', form)
 }
 
 function getBusyTime(data: any) {
-  return data.busy_start_time + " ~ " + data.busy_end_time
+  return data.busy_start_time + ' ~ ' + data.busy_end_time
 }
 
 function siteStartTimeChange() {
-  console.log("出发了特定的函数")
+  console.log('出发了特定的函数')
   form.value.site_end_time = ''
 }
 
 function edit(data: any) {
-  func = "update"
+  func = 'update'
   dialogFormVisible.value = true
-  let copyObj1 = copyObj(data);
+  let copyObj1 = copyObj(data)
   form.value = copyObj1
   form.value.free_price = copyObj1.free_price / 100
   form.value.busy_price = copyObj1.busy_price / 100
@@ -299,8 +290,6 @@ function copyObj(obj: any): any {
 
   return newObj
 }
-
-
 </script>
 
 <style scoped lang="scss">

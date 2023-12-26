@@ -8,7 +8,7 @@ export type ButtonType = {
 
 // 表格列属性
 export type TableQueryType = {
-  current: number
+  page: number
   size: number
   params: any
 }

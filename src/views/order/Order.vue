@@ -1,291 +1,122 @@
-<script setup lang="ts">
-import { Timer } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+<template>
+  <ContentWrap>
+    <data-table :options="options" :query="query" ref="tableRef">
+      <template #search>
+        <el-input
+          class="filter-item"
+          clearable
+          v-model="query.params['user_name']"
+          placeholder="搜索用户名称"
+        />
+      </template>
+
+      <template #columns>
+        <el-table-column type="selection" width="50px" />
+        <el-table-column prop="order_no" label="订单号" width="300px" />
+        <el-table-column prop="user_name" label="用户名" />
+        <el-table-column prop="type" label="类型">
+          <template #default="scope">
+            {{ getTypeText(scope.row.type) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" label="状态">
+          <template #default="scope">
+            {{ getStatusText(scope.row.status) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="gmt_create" label="创建日期" />
+        <el-table-column prop="user_phone" label="下单手机号" />
+        <el-table-column prop="remake" label="备注" />
+        <el-table-column label="操作" width="180px" :align="'center'">
+          <template #default="scope">
+            <el-button
+              icon="Setting"
+              type="primary"
+              size="small"
+              @click="showDetail(scope.$index, scope.row)"
+              >详情</el-button
+            >
+          </template>
+        </el-table-column>
+      </template>
+    </data-table>
+  </ContentWrap>
+</template>
+
+<script lang="ts" setup>
+import { ContentWrap } from '@/components/ContentWrap'
+import { DataTable } from '@/components/DataTable'
+import { ref, reactive, unref } from 'vue'
+import type {
+  OptionsType,
+  TableQueryType,
+} from '@/components/DataTable/src/types'
+// import DictListSelect from '@/components/DictListSelect/src/DictListSelect.vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+// 表格查询参数
+let query = ref<TableQueryType>({
+  page: 1,
+  size: 10,
+  params: {
+    shop_id: 1,
+  },
+})
 
-interface Order {
-  id: string
-  username: string
-  type: string
-  state: string
-  money: number
-  datetime: Date
-  site_info: string
-  info: string
-  mark: string
+// 表格默认参数
+let options = ref<OptionsType>({
+  listUrl: '/saas/get/order/list',
+  // delUrl: '/saas/del/role',
+  add: {
+    enable: false,
+    // permission: ['role:add'],
+  },
+  edit: {
+    enable: false,
+    // permission: ['role:edit'],
+  },
+  del: {
+    enable: false,
+    // permission: ['role:delete'],
+  },
+
+  // 批量操作
+  batch: [
+    {
+      key: 'state',
+      label: '启用',
+      params: { state: 1 },
+      action: '/api/user/state',
+      idsKey: 'userIds',
+    },
+    {
+      key: 'state',
+      label: '禁用',
+      params: { state: 0 },
+    },
+  ],
+})
+
+const tableRef = ref()
+
+const getStatusText = (index: string) => {
+  // Y:已支付 N:待支付 c:已取消
+  if (index == 'Y') return '已支付'
+  else if (index == 'N') return '待支付'
+  else if (index == 'C') return '已取消'
+  else return '未知'
+}
+
+const getTypeText = (index: number) => {
+  if (index == 1) return '线上'
+  else if (index == 10) return '线下'
+  else '其他'
 }
 
 // 查看详情
-const handleEdit = (index: number, row: Order) => {
-  router.push('/order_detail')
+const showDetail = (index: number, row: any) => {
+  router.push({ path: '/order_detail', query: { order: JSON.stringify(row) } })
   console.log(index, row)
-}
-const handleDelete = (index: number, row: Order) => {
-  console.log(index, row)
-}
-
-const order_id = ref('')
-const order_user = ref('')
-const order_time = ref('')
-const order_source = ref('')
-const order_state = ref('')
-
-const source_options = [
-  {
-    value: '线上',
-    label: '线上',
-  },
-  {
-    value: '线下',
-    label: '线下',
-  },
-]
-const state_options = [
-  {
-    value: '待使用',
-    label: '待使用',
-  },
-  {
-    value: '已使用',
-    label: '已使用',
-  },
-]
-const defaultTime = ref<[Date, Date]>([
-  new Date(2000, 1, 1, 0, 0, 0),
-  new Date(2000, 2, 1, 23, 59, 59),
-])
-
-const tableData: Order[] = [
-  {
-    id: '20230202026515665',
-    username: 'Tom',
-    type: '线上',
-    state: '待使用',
-    money: 200,
-    datetime: new Date(2023, 11, 7, 0, 0, 0),
-    site_info: '2号场地',
-    info: '张国志',
-    mark: '交际草',
-  },
-  {
-    id: '20230202026515665',
-    username: 'Tom',
-    type: '线上',
-    state: '待使用',
-    money: 200,
-    datetime: new Date(2023, 11, 7, 0, 0, 0),
-    site_info: '2号场地',
-    info: '张国志',
-    mark: '交际草',
-  },
-  {
-    id: '20230202026515665',
-    username: 'Tom',
-    type: '线上',
-    state: '待使用',
-    money: 200,
-    datetime: new Date(2023, 11, 7, 0, 0, 0),
-    site_info: '2号场地',
-    info: '张国志',
-    mark: '交际草',
-  },
-]
-
-function formattedDate(date: Date) {
-  // 使用Date对象的toLocaleString方法进行格式化
-  // 你可以根据需要选择不同的语言和格式选项
-  return date.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-  })
-}
-
-// 分页信息
-
-const currentPage4 = ref(4)
-const pageSize4 = ref(100)
-const small = ref(false)
-const background = ref(false)
-const disabled = ref(false)
-
-const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`)
-}
-const handleCurrentChange = (val: number) => {
-  console.log(`current page: ${val}`)
 }
 </script>
-
-<template>
-  <div class="order_main">
-    <div>
-      <span>订单编号</span>
-      <el-input
-        v-model="order_id"
-        class="w-50 m-2"
-        placeholder="请输入订单编号"
-      />
-
-      <span>订单来源</span>
-      <el-select v-model="order_source" class="m-2" placeholder="全部订单">
-        <el-option
-          v-for="item in source_options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
-
-      <span>订单状态</span>
-      <el-select v-model="order_state" class="m-2" placeholder="默认">
-        <el-option
-          v-for="item in state_options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
-
-      <span>用户</span>
-      <el-input
-        v-model="order_user"
-        class="w-50 m-2"
-        placeholder="请输入用户名称"
-      />
-
-      <span>下单时间</span>
-      <div class="date_block">
-        <el-date-picker
-          v-model="order_time"
-          type="daterange"
-          start-placeholder="起始时间"
-          end-placeholder="结束时间"
-          :default-time="defaultTime"
-        />
-      </div>
-
-      <el-button type="primary" :icon="Search">查询</el-button>
-    </div>
-    <div>
-      <el-table :data="tableData" stripe style="width: 100%">
-        <el-table-column label="订单编号" width="180">
-          <template #default="scope">
-            <span>{{ scope.row.id }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="用户" width="80">
-          <template #default="scope">
-            <span>{{ scope.row.username }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="订单分类" width="100">
-          <template #default="scope">
-            <span>{{ scope.row.type }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="订单状态" width="100">
-          <template #default="scope">
-            <el-tag>{{ scope.row.state }}</el-tag>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="下单时间" width="180">
-          <template #default="scope">
-            <span>{{ formattedDate(scope.row.datetime) }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="场地信息" width="180">
-          <template #default="scope">
-            <span>{{ scope.row.site_info }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="预约信息" width="180">
-          <template #default="scope">
-            <span>{{ scope.row.info }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="备注" width="180">
-          <template #default="scope">
-            <span>{{ scope.row.mark }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="操作">
-          <template #default="scope">
-            <el-button size="small" @click="handleEdit(scope.$index, scope.row)"
-              >详情</el-button
-            >
-            <!-- <el-button
-              size="small"
-              type="danger"
-              @click="handleDelete(scope.$index, scope.row)"
-              >Delete</el-button
-            > -->
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="el_page">
-        <el-pagination
-          v-model:current-page="currentPage4"
-          v-model:page-size="pageSize4"
-          :page-sizes="[100, 200, 300, 400]"
-          :small="small"
-          :disabled="disabled"
-          :background="background"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="400"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </div>
-  </div>
-</template>
-
-<style scoped>
-a {
-  color: #42b983;
-}
-
-label {
-  margin: 0 0.5em;
-  font-weight: bold;
-}
-
-code {
-  background-color: #eee;
-  padding: 2px 4px;
-  border-radius: 4px;
-  color: #304455;
-}
-
-.m-2 {
-  width: 150px;
-  margin: 0 20px 0 10px;
-}
-.date_block {
-  display: inline-block;
-  margin: 0 10px;
-}
-.order_main {
-  margin: 30px;
-}
-
-.el_page {
-  padding: 10px;
-  float: right;
-}
-</style>
