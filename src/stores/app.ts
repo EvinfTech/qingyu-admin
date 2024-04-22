@@ -18,11 +18,7 @@ interface appStore {
 }
 
 
-const initTabs: Tab[] = [{
-  title: '首页',
-  path: '/datecenter/business',
-  closable: false,
-}]
+const initTabs: Tab[] = []
 
 export const useAppStore = defineStore("app", {
   state: (): appStore => {
@@ -59,6 +55,7 @@ export const useAppStore = defineStore("app", {
     },
     removeAllTab() {
       this.tabsChrome = cloneDeep(initTabs)
+      console.log(this.tabsChrome)
     }
   }
 })

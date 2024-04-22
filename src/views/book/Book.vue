@@ -102,7 +102,6 @@
       </div>
       <div class="right-middle">
         <h3>场次信息</h3>
-
         <div v-for="item in SiteSelectDetail">
           <div v-if="item.time_enum.length != 0">
             <div class="right-middle-show">
@@ -141,7 +140,7 @@
 import { onMounted, reactive, ref } from 'vue'
 import { SaasAddOrder, SaasGetSiteReserve } from '@/api/site'
 import { useEnumStore } from '@/stores/enum.ts'
-import CanChoose from '@/views/site/CanChoose.vue'
+import CanChoose from '@/views/book/CanChoose.vue'
 import { ElMessage } from 'element-plus'
 import { Check } from '@element-plus/icons-vue'
 
@@ -156,10 +155,9 @@ let form = reactive({
   phone: '',
   remake: '',
 })
-//选择的日期
-let selectDate = ''
-//按钮颜色
-let upBtn = 0
+
+let selectDate = '' //选择的日期
+let upBtn = 0 //按钮颜色
 
 function getDate(aa: any) {
   window.setTimeout(function () {
@@ -197,8 +195,6 @@ onMounted(() => {
   upBtn = 1
   selectDate = getTodayDate()
   infoData(getTodayDate())
-
-  //整理数据
 })
 
 function dateButton(n: any) {
@@ -308,23 +304,6 @@ function getSiteSumMoney(site: any) {
   return totalMoney / 100
 }
 
-// {
-//      "user_name":"散客",
-//     "user_phone":"19999999999",
-//     "remake":"这个人打球很垃圾",
-//     "shop_id":1,
-//     "gmt_site_use":"2023-11-14",
-//     "site_detail":[
-//   {
-//     "site_id":1,
-//     "time_enum":[1,2,3]
-//   },
-//   {
-//     "site_id":2,
-//     "time_enum":[1,2,3]
-//   }
-// ]
-// }
 function submit() {
   var data = reactive<any>({
     user_name: form.name,

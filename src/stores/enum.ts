@@ -2,7 +2,6 @@
 import {defineStore} from "pinia"
 import {storagePrefixKey} from "@/config/app.ts";
 import storage from "good-storage";
-import {User} from "@/stores/user.ts";
 
 const UIK = storagePrefixKey + "Enum"
 

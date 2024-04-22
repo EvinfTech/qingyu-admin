@@ -7,7 +7,7 @@
       <p>场馆头像</p>
       <el-upload
         class="avatar-uploader"
-        action="http://172.16.8.5:8082/upload/common"
+        action="http://172.16.7.99:8002/upload/common"
         :show-file-list="false"
         :on-preview="handlePictureCardPreview"
         :on-success="handleAvatarSuccess"
@@ -24,7 +24,7 @@
 
       <el-upload
         :file-list="fileList"
-        action="http://172.16.8.5:8082/upload/common"
+        action="http://172.16.7.99:8002/upload/common"
         list-type="picture-card"
         :on-preview="handlePictureCardPreview"
         :on-remove="handleRemove"

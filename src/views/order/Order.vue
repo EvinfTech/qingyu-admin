@@ -116,7 +116,10 @@ const getTypeText = (index: number) => {
 
 // 查看详情
 const showDetail = (index: number, row: any) => {
-  router.push({ path: '/order_detail', query: { order: JSON.stringify(row) } })
+  router.push({
+    path: '/order/order_detail',
+    query: { order: JSON.stringify(row) },
+  })
   console.log(index, row)
 }
 </script>

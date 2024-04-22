@@ -1,7 +1,6 @@
-import {reactive} from "vue";
-import {RouteRecordRaw} from "vue-router/dist/vue-router.d.ts";
-import {menuRoute} from "@/router/index";
-
+import { reactive } from "vue";
+import { RouteRecordRaw } from "vue-router";
+import { menuRoute } from "@/router/index";
 
 //处理路由让其作为菜单
 //当hideMenu会删除此菜单。默认当有children字段并且里面为空时不显示当前菜单，但是在此路由添加alwaysShow也会显示出来
@@ -25,6 +24,8 @@ const menu = (routes: RouteRecordRaw[]): RouteRecordRaw[] => {
       result.push(v)
     }
   })
+
+  console.log(result)
   return result
 }
 
