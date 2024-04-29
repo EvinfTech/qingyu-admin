@@ -1,99 +1,14 @@
-<script setup lang="ts">
-import { ref } from 'vue'
-const testData1 = [
-  { text: '总订单额', value: 999 },
-  { text: '总支付订单额', value: 999 },
-  { text: '总退款订单额', value: 999 },
-  { text: '总成交额', value: 999 },
-  { text: '今日订单额', value: 999 },
-  { text: '今日支付订单额', value: 999 },
-  { text: '今日退款订单额', value: 999 },
-  { text: '今日成交额', value: 999 },
-]
-
-interface Turnover {
-  id: string
-  datetime: Date
-  order_id: string
-  group: string
-  type: string
-  money: number
-  sum: number // 余额
-}
-
-const tableData: Turnover[] = [
-  {
-    id: '20230202026515665',
-    datetime: new Date(2023, 11, 7, 0, 0, 0),
-    order_id: '20230202026515665',
-    group: '订单',
-    type: '交易',
-    money: 200,
-    sum: 10000, // 余额
-  },
-  {
-    id: '20230202026515665',
-    datetime: new Date(2023, 11, 7, 0, 0, 0),
-    order_id: '20230202026515665',
-    group: '订单',
-    type: '交易',
-    money: 200,
-    sum: 10000, // 余额
-  },
-  {
-    id: '20230202026515665',
-    datetime: new Date(2023, 11, 7, 0, 0, 0),
-    order_id: '20230202026515665',
-    group: '订单',
-    type: '交易',
-    money: 200,
-    sum: 10000, // 余额
-  },
-]
-
-// 查看详情
-const handleEdit = (index: number, row: Turnover) => {
-  // router.push('/order_detail')
-  console.log(index, row)
-}
-
-// 分页信息
-
-const currentPage4 = ref(4)
-const pageSize4 = ref(100)
-const small = ref(false)
-const background = ref(false)
-const disabled = ref(false)
-
-const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`)
-}
-const handleCurrentChange = (val: number) => {
-  console.log(`current page: ${val}`)
-}
-
-function formattedDate(date: Date) {
-  // 使用Date对象的toLocaleString方法进行格式化
-  // 你可以根据需要选择不同的语言和格式选项
-  return date.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-  })
-}
-</script>
-
 <template>
   <div class="fund_main">
     <div class="store_box">
       <div class="store_head">
-        <img src="@/assets/logo.png" />
-        <div class="store_head_main">
-          <p class="store_name">我的店铺名称</p>
+        <el-avatar
+          shape="square"
+          :size="180"
+          :src="baseURL + '/' + store.avatar"
+        />
+        <div class="store_head_main hidden-xs-only">
+          <p class="store_name">{{ store.name }}</p>
           <p class="store_tips">已使用奇羽SaaS运营366天</p>
           <div class="store_card">
             <div>
@@ -108,7 +23,7 @@ function formattedDate(date: Date) {
               <p class="card_text">可提现</p>
               <p class="card_value">7,425.75</p>
             </div>
-            <el-button type="warning">提现</el-button>
+            <el-button type="warning" @click="cash()">提现</el-button>
           </div>
         </div>
         <el-tag>运营中</el-tag>
@@ -183,12 +98,12 @@ function formattedDate(date: Date) {
         <el-pagination
           v-model:current-page="currentPage4"
           v-model:page-size="pageSize4"
-          :page-sizes="[100, 200, 300, 400]"
+          :page-sizes="[20, 50, 100]"
           :small="small"
           :disabled="disabled"
           :background="background"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="400"
+          layout="total, sizes, prev, pager, next"
+          :total="3"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
@@ -196,6 +111,120 @@ function formattedDate(date: Date) {
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import 'element-plus/theme-chalk/display.css'
+import { ElNotification } from 'element-plus'
+import { getShopDetail } from '@/api/venue'
+import { baseURL } from '@/config/request.ts'
+
+const testData1 = [
+  { text: '总订单额', value: 999 },
+  { text: '总支付订单额', value: 999 },
+  { text: '总退款订单额', value: 999 },
+  { text: '总成交额', value: 999 },
+  { text: '今日订单额', value: 999 },
+  { text: '今日支付订单额', value: 999 },
+  { text: '今日退款订单额', value: 999 },
+  { text: '今日成交额', value: 999 },
+]
+
+interface Turnover {
+  id: string
+  datetime: Date
+  order_id: string
+  group: string
+  type: string
+  money: number
+  sum: number // 余额
+}
+
+const store = ref({ name: '', avatar: '' })
+
+const tableData: Turnover[] = [
+  {
+    id: '20230202026515665',
+    datetime: new Date(2023, 11, 7, 0, 0, 0),
+    order_id: '20230202026515665',
+    group: '订单',
+    type: '交易',
+    money: 200,
+    sum: -600, // 余额
+  },
+  {
+    id: '2024020202651512312',
+    datetime: new Date(2023, 11, 7, 0, 0, 0),
+    order_id: '20230202026515665',
+    group: '订单',
+    type: '提现',
+    money: -1000,
+    sum: -800, // 余额
+  },
+  {
+    id: '20230202026515665',
+    datetime: new Date(2023, 11, 7, 0, 0, 0),
+    order_id: '20230202026515665',
+    group: '订单',
+    type: '交易',
+    money: 200,
+    sum: 200, // 余额
+  },
+]
+
+onMounted(() => {
+  getShopDetail({ shop_id: 1 }).then((res: any) => {
+    store.value.name = res.data.data.name
+    store.value.avatar = res.data.data.avatar
+  })
+})
+
+const cash = () => {
+  ElNotification({
+    title: '提示',
+    message: '请绑定银行卡信息',
+    type: 'info',
+  })
+}
+
+// 查看详情
+const handleEdit = (index: number, row: Turnover) => {
+  // router.push('/order/order_detail')
+  console.log(index, row)
+  ElNotification({
+    title: '暂无数据',
+    message: '暂无数据',
+    type: 'info',
+  })
+}
+
+// 分页信息
+const currentPage4 = ref(1)
+const pageSize4 = ref(20)
+const small = ref(false)
+const background = ref(false)
+const disabled = ref(false)
+
+const handleSizeChange = (val: number) => {
+  console.log(`${val} items per page`)
+}
+const handleCurrentChange = (val: number) => {
+  console.log(`current page: ${val}`)
+}
+
+function formattedDate(date: Date) {
+  // 使用Date对象的toLocaleString方法进行格式化
+  // 你可以根据需要选择不同的语言和格式选项
+  return date.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  })
+}
+</script>
 
 <style scoped>
 p {
@@ -224,7 +253,7 @@ p {
     justify-content: space-between;
     .store_head_main {
       margin: 0 30px;
-      width: 100%;
+      width: 70%;
       .store_name {
         font-size: 32px;
         font-weight: bold;
@@ -290,6 +319,7 @@ p {
   }
 }
 
-.bill_box {
+.el_page {
+  padding-top: 10px;
 }
 </style>

@@ -18,8 +18,7 @@ const { asideCollapse } = storeToRefs(appStore)
 const commonEnum = useEnumStore()
 
 onMounted(() => {
-  commonGetEnum().then((res) => {
-    console.log('获取全局枚举成功', res.data.data)
+  commonGetEnum().then((res: any) => {
     commonEnum.updateUserInfo(res.data.data)
   })
 })

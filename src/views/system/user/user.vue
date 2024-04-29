@@ -30,7 +30,7 @@
         <el-table-column prop="total_count" label="运动总次数" />
         <el-table-column prop="total_length" label="运动总时常" />
         <el-table-column prop="gmt_create" label="创建日期" />5
-        <el-table-column label="操作" width="180px" :align="'center'">
+        <!-- <el-table-column label="操作" width="180px" :align="'center'">
           <template #default="scope">
             <el-button
               icon="Setting"
@@ -40,17 +40,16 @@
               >角色授权</el-button
             >
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </template>
     </data-table>
 
     <el-dialog
       v-model="dialogVisible"
       title="修改信息"
-      width="30%"
       :before-close="handleClose"
     >
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
+      <el-form :model="form" :rules="rules" ref="formRef" label-position="top">
         <el-form-item label="用户名称" prop="name">
           <el-input v-model="form.name" autocomplete="off" />
         </el-form-item>
@@ -82,14 +81,14 @@ import type {
 } from '@/components/DataTable/src/types'
 import type { FormInstance, FormRules } from 'element-plus'
 // import DictListSelect from '@/components/DictListSelect/src/DictListSelect.vue'
-import type { RoleDataType } from './types'
+// import type { RoleDataType } from '@/views/system/role/types'
 import { ElMessage } from 'element-plus'
-import { addRole, updateRole } from '@/api/sys/role'
+import { addRole } from '@/api/sys/role'
 import { updateUserInfo } from '@/api/sys/user'
 
 // 表格查询参数
 let query = ref<TableQueryType>({
-  current: 1,
+  page: 1,
   size: 10,
   params: {
     title: '',
@@ -101,15 +100,15 @@ let options = ref<OptionsType>({
   listUrl: '/saas/get/user/list',
   delUrl: '/saas/del/role',
   add: {
-    enable: true,
+    enable: false,
     // permission: ['role:add'],
   },
   edit: {
-    enable: true,
+    enable: false,
     // permission: ['role:edit'],
   },
   del: {
-    enable: true,
+    enable: false,
     // permission: ['role:delete'],
   },
 
@@ -133,7 +132,10 @@ let options = ref<OptionsType>({
 const tableRef = ref()
 
 const dialogVisible = ref(false)
-const form = ref<RoleDataType>({})
+const form = ref<any>({
+  name: '',
+  phone: '',
+})
 const formRef = ref<FormInstance>()
 const rules = reactive<FormRules>({
   roleName: [
@@ -211,12 +213,12 @@ const handleSave = (formEl: FormInstance | undefined) => {
   })
 }
 
-const grantVisible = ref(false)
-const grantRoleId = ref(0)
+// const grantVisible = ref(false)
+// const grantRoleId = ref(0)
 
 // 获取角色信息
-const showGrant = (row: any) => {
-  grantVisible.value = true
-  grantRoleId.value = row.id
-}
+// const showGrant = (row: any) => {
+//   grantVisible.value = true
+//   grantRoleId.value = row.id
+// }
 </script>

@@ -1,3 +1,3 @@
-import DictListSelect from './src/DictListSelect.vue'
+// import DictListSelect from './src/DictListSelect.vue'
 
-export { DictListSelect }
+// export { DictListSelect }

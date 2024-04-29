@@ -5,13 +5,15 @@ import * as echarts from 'echarts'
 type EChartsOption = echarts.EChartsOption
 
 var chartDom
-var myChart
+var myChart: any
 var option: EChartsOption
 
 option = {
   color: ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00'],
   title: {
-    text: 'Gradient Stacked Area Chart',
+    text: '到店流量',
+    top: '10',
+    left: '10',
   },
   tooltip: {
     trigger: 'axis',
@@ -23,7 +25,8 @@ option = {
     },
   },
   legend: {
-    data: ['Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 5'],
+    data: ['1号场', '2号场', '3号场', '4号场', '5号场'],
+    top: '10',
   },
   toolbox: {
     feature: {
@@ -40,7 +43,7 @@ option = {
     {
       type: 'category',
       boundaryGap: false,
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
     },
   ],
   yAxis: [
@@ -50,7 +53,7 @@ option = {
   ],
   series: [
     {
-      name: 'Line 1',
+      name: '1号场',
       type: 'line',
       stack: 'Total',
       smooth: true,
@@ -77,7 +80,7 @@ option = {
       data: [140, 232, 101, 264, 90, 340, 250],
     },
     {
-      name: 'Line 2',
+      name: '2号场',
       type: 'line',
       stack: 'Total',
       smooth: true,
@@ -104,7 +107,7 @@ option = {
       data: [120, 282, 111, 234, 220, 340, 310],
     },
     {
-      name: 'Line 3',
+      name: '3号场',
       type: 'line',
       stack: 'Total',
       smooth: true,
@@ -131,7 +134,7 @@ option = {
       data: [320, 132, 201, 334, 190, 130, 220],
     },
     {
-      name: 'Line 4',
+      name: '4号场',
       type: 'line',
       stack: 'Total',
       smooth: true,
@@ -158,7 +161,7 @@ option = {
       data: [220, 402, 231, 134, 190, 230, 120],
     },
     {
-      name: 'Line 5',
+      name: '5号场',
       type: 'line',
       stack: 'Total',
       smooth: true,
@@ -190,6 +193,10 @@ option = {
     },
   ],
 }
+// 为窗口大小变化添加事件监听器
+window.addEventListener('resize', function () {
+  myChart.resize()
+})
 
 onMounted(() => {
   chartDom = document.getElementById('main2')!

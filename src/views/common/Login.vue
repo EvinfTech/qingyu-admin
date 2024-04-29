@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { appName, version } from '@/config/app'
+import { appName } from '@/config/app'
 import { useUserStore } from '@/stores/user'
-import { User as UserType } from '@/stores/type'
+import { User as UserType } from '@/stores/user'
 import { reactive, ref } from 'vue'
 import { saasLogin } from '@/api/common'
 import { ElMessage } from 'element-plus'

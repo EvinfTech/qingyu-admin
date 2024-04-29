@@ -1,549 +1,365 @@
 <template>
-  <div class="site-main">
-    <div class="left">
-      <div class="left-top">
-        <h3>订场面板</h3>
-        <div class="example-container" style="background-color: #0077ff" />
-        <span class="text-example">线下预定</span>
-
-        <div class="example-container" style="background-color: #ffc300" />
-        <span class="text-example">线上预定</span>
-
-        <div class="example-container" style="background-color: #d8d8d8" />
-        <span class="text-example">不可预定</span>
-
-        <div class="example-container" style="background-color: #eff3ff" />
-        <span class="text-example">可预定</span>
-
-        <div
-          class="example-container example-container-chose"
-          style="background-color: #eff3ff"
+  <el-row>
+    <el-col :lg="18" :md="24">
+      <div class="legend">
+        <el-tag
+          v-for="item in legends"
+          :key="item.name"
+          :type="item.type"
+          effect="dark"
+          size="large"
         >
-          <span class="tick">
-            <el-icon size="10"><Check /></el-icon>
-          </span>
-        </div>
-        <span class="text-example">已选择</span>
+          {{ item.name }}
+        </el-tag>
+        <el-check-tag>可预定</el-check-tag>
+        <el-check-tag checked>已选择</el-check-tag>
       </div>
-      <div class="left-main">
-        <div class="date-select">
-          <el-button
-            round
-            v-for="n in 7"
-            :key="n"
-            :class="{ active: n == upBtn }"
-            @click="dateButton(n - 1)"
-          >
-            {{ getDate(n - 1) }}
-          </el-button>
-        </div>
-        <div class="site-select">
-          <div>
-            <el-table
-              class="my_table"
-              :data="SiteTimeEnum"
-              style="width: 100%"
-              :cell-style="{ padding: '2px 0px 2px 0px' }"
-            >
-              <el-table-column prop="time" label="Date" width="100">
-                <template #default="scope">
-                  <div v-if="scope.$index == 0" class="time-enum-start">
-                    {{ getTimeEnumStart(SiteTimeEnum[0].time) }}
-                  </div>
-                  <div class="time-enum">
-                    {{ getTimeEnum(scope.row.time) }}
-                  </div>
-                </template>
-              </el-table-column>
-              <el-table-column
-                v-for="(column, index) in SiteDetail"
-                :label="column.site_name"
-                :key="index"
-                :highlight-current-row="true"
-                width="130"
-              >
-                <template #default="scope">
-                  <div>
-                    <!--                                                            {{ scope.row.time }}-->
-                    <!--                    <el-button class="site-select-button" color="#EFF3FF" type="success"-->
-                    <!--                               style="width: 110px;height: 55px;color: #9E9E9E">￥100-->
-                    <!--                    </el-button>-->
-                    <!--                    类型：1:时间段过了  2:线上  3:线下-->
-                    <CanChoose
-                      :money="getMoney(scope.row.time, column)"
-                      :status="getStatus(scope.row.time, column)"
-                      @click="updateSiteDetail(column, scope.row.time)"
-                      style="width: 110px; height: 55px"
-                    />
-                    <!--                    <div>{{getMoney(scope.row.time,scope.column.property)}}</div>-->
-                  </div>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="right">
-      <div class="right-top">
+      <div class="left-main">
+        <el-radio-group
+          v-model="selectDate"
+          :size="isMinScreen ? 'small' : 'large'"
+        >
+          <el-radio-button
+            v-for="item in nextSevenDays"
+            :label="item.short"
+            :value="item.long"
+          ></el-radio-button>
+        </el-radio-group>
+        <el-table class="my_table" :data="tableData" style="width: 100%">
+          <el-table-column fixed prop="timeValue" label="时间" width="70">
+          </el-table-column>
+          <el-table-column
+            v-for="(column, index) in colNames"
+            :label="column"
+            :key="index"
+            :prop="column"
+            :highlight-current-row="true"
+            width="130"
+          >
+            <template #default="scope">
+              <div>
+                <el-check-tag
+                  v-if="scope.row[column].price"
+                  class="el-check-box"
+                  :checked="scope.row[column].checked"
+                  @change="onTagChange(scope.row[column])"
+                  >{{ formatPrice(scope.row[column].price) }}</el-check-tag
+                >
+                <el-tag
+                  v-else
+                  :type="getTagType(scope.row[column])"
+                  effect="dark"
+                  size="large"
+                  style="width: 90px; height: 48px"
+                >
+                  {{ scope.row[column] }}
+                </el-tag>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </el-col>
+    <el-col :lg="6">
+      <div class="book_info">
         <h3>预约信息</h3>
-        <el-form :model="form">
-          <el-form-item label="姓名">
+        <el-form ref="ruleFormRef" :model="form" :rules="rules">
+          <el-form-item label="姓名" prop="name">
             <el-input v-model="form.name" />
           </el-form-item>
-          <el-form-item label="手机">
+          <el-form-item label="手机" prop="phone">
             <el-input v-model="form.phone" />
           </el-form-item>
-          <el-form-item label="备注">
+          <el-form-item label="备注" prop="remake">
             <el-input v-model="form.remake" />
           </el-form-item>
         </el-form>
-      </div>
-      <div class="right-middle">
         <h3>场次信息</h3>
-        <div v-for="item in SiteSelectDetail">
-          <div v-if="item.time_enum.length != 0">
-            <div class="right-middle-show">
-              <div class="right-middle-show-top">
-                线下预约:{{ getSiteName(item) }}
-              </div>
-              <div class="right-middle-show-bottom">
-                <div style="color: #9e9e9e">
-                  今天 12-07 共{{ getSiteCount(item) }}场
-                </div>
-                <div style="color: #f44336; font-size: 17px">
-                  ￥{{ getSiteSumMoney(item) }}
-                </div>
+        <div v-for="item in showSeletSite">
+          <div class="right-middle-show">
+            <div>线下预约:{{ item.site }}</div>
+            <div class="flex_box" v-for="data in item.data">
+              <div>{{ data.time_value }}</div>
+              <div style="color: #f44336">
+                {{ formatPrice(data.price) }}
               </div>
             </div>
+            <div>{{ selectDate }} 共{{ item.data.length }}场</div>
           </div>
         </div>
-      </div>
-
-      <div class="bill">
-        <div class="bill-top">
+        <div class="flex_box">
           <h3>合计</h3>
-          <h3 style="color: #f44336">￥{{ getOrderSumMoney() }}</h3>
+          <h3 style="color: #f44336">{{ formatPrice(showTotal) }}</h3>
         </div>
         <el-button
-          @click="submit()"
+          @click="submit(ruleFormRef)"
           type="primary"
           style="width: 100%; height: 40%"
           >结算</el-button
         >
       </div>
-    </div>
-  </div>
+    </el-col>
+  </el-row>
 </template>
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
-import { SaasAddOrder, SaasGetSiteReserve } from '@/api/site'
+import { onMounted, reactive, ref, watch } from 'vue'
+import { addOrder, getSiteReserve } from '@/api/site'
 import { useEnumStore } from '@/stores/enum.ts'
-import CanChoose from '@/views/book/CanChoose.vue'
 import { ElMessage } from 'element-plus'
-import { Check } from '@element-plus/icons-vue'
+import { minScreenMaxWidth } from '@/config/app'
+import { useMediaQuery } from '@vueuse/core'
+import dayjs from 'dayjs'
+import type { FormInstance, FormRules } from 'element-plus'
 
-var SiteTimeEnum = ref<any>([])
-var SiteDetail = ref<any>([])
-let TimeEnum = useEnumStore()
-var currentHour = new Date().getHours()
-const today = new Date()
-var SiteSelectDetail = ref<any>([])
-let form = reactive({
+const isMinScreen = useMediaQuery(`(max-width: ${minScreenMaxWidth}px)`)
+
+const timeEnums = useEnumStore().Enum.time_enum // 时间枚举
+const colNames = ref([] as any)
+const tableData = ref<any>([])
+const seletSite = ref<any>([])
+const showSeletSite = ref<any>([])
+const showTotal = ref(0)
+const nextSevenDays = ref([] as any)
+const selectDate = ref('') //选择的日期
+
+const legends = [
+  { name: '线下预定', type: 'primary' },
+  { name: '线上预定', type: 'warning' },
+  { name: '不可预定', type: 'info' },
+]
+
+const ruleFormRef = ref<FormInstance>()
+let form = reactive<RuleForm>({
   name: '',
   phone: '',
   remake: '',
 })
 
-let selectDate = '' //选择的日期
-let upBtn = 0 //按钮颜色
+interface RuleForm {
+  name: string
+  phone: string
+  remake: string
+}
 
-function getDate(aa: any) {
-  window.setTimeout(function () {
-    window.requestAnimationFrame(getDate)
-  }, 1000 / 2)
-  var d = new Date(today.getTime() + 24 * aa * 60 * 60 * 1000)
-  var month: any = d.getMonth() + 1 //获取月，从 Date 对象返回月份 (0 ~ 11)，故在此处+1
-  var day: any = d.getDay() //获取日
-  var days: any = d.getDate() //获取日期
+const rules = reactive<FormRules<RuleForm>>({
+  name: [
+    { required: true, message: '请输入预定人姓名', trigger: 'blur' },
+    { min: 1, max: 15, message: '最长输入15个字符', trigger: 'blur' },
+  ],
+  phone: [
+    { required: true, message: '请输入电话号码', trigger: 'blur' },
+    { min: 11, max: 11, message: '电话格式不正确', trigger: 'blur' },
+  ],
+})
 
-  if (month < 10) month = '0' + month
-  if (days < 10) days = '0' + days
-
-  var week = [
-    '星期日',
-    '星期一',
-    '星期二',
-    '星期三',
-    '星期四',
-    '星期五',
-    '星期六',
-  ]
-
-  var a = month + '-' + days
-  var c = week[day]
-
-  if (aa == 0) {
-    return '今天 ' + a
-  } else {
-    return c + ' ' + a
+// 获取未来七天日期
+const initSevenDays = () => {
+  let today = dayjs()
+  for (let i = 0; i < 7; i++) {
+    let futureDate = today.add(i, 'day')
+    nextSevenDays.value.push({
+      short: futureDate.format('MM-DD'),
+      long: futureDate.format('YYYY-MM-DD'),
+    })
   }
+  selectDate.value = nextSevenDays.value[0].long
 }
 
 onMounted(() => {
-  upBtn = 1
-  selectDate = getTodayDate()
-  infoData(getTodayDate())
+  seletSite.value = []
+  initSevenDays()
 })
 
-function dateButton(n: any) {
-  //清空选择列表
-  SiteSelectDetail = ref<any>([])
-  upBtn = n + 1
-  const today = new Date(new Date().getTime() + 24 * n * 60 * 60 * 1000)
-  const year = today.getFullYear()
-  const month = String(today.getMonth() + 1).padStart(2, '0')
-  const day = String(today.getDate()).padStart(2, '0')
-  const thisDayDate = `${year}-${month}-${day}` //打印当前日期
-  selectDate = thisDayDate
-  infoData(thisDayDate)
+watch(
+  () => selectDate.value,
+  () => {
+    updateData(selectDate.value)
+    seletSite.value = []
+  }
+)
+
+const onTagChange = (item: any) => {
+  item.checked = !item.checked
+  if (item.checked) {
+    seletSite.value.push(item)
+  } else {
+    seletSite.value.splice(seletSite.value.indexOf(item), 1)
+  }
+  setShowSeletSite()
 }
 
-function getTodayDate() {
-  const today = new Date()
-  const year = today.getFullYear()
-  const month = String(today.getMonth() + 1).padStart(2, '0')
-  const day = String(today.getDate()).padStart(2, '0')
-  const thisDayDate = `${year}-${month}-${day}` //打印当前日期
-  return thisDayDate
-}
+// 设置侧栏选中的场地信息
+const setShowSeletSite = () => {
+  showSeletSite.value = []
+  showTotal.value = 0
+  colNames.value.forEach((item: any) => {
+    let tmp = { site: item, data: [] as any }
+    seletSite.value.forEach((element: any) => {
+      const siteName = element.site_name
 
-//计算订单总金额
-function getOrderSumMoney() {
-  let sumMoney = 0
-  SiteSelectDetail.value.forEach((value: any) => {
-    sumMoney += getSiteSumMoney(value)
-  })
-  return sumMoney
-}
-
-//初始化方法
-function infoData(date: any) {
-  SiteDetail.value = []
-  SiteTimeEnum.value = []
-  SaasGetSiteReserve({ shop_id: 1, date: date }).then((res: any) => {
-    //初始时间枚举
-    var timeEnum = ref<any>([])
-    res.data.data.forEach((value: any) => {
-      value.store_time_enum.forEach((v: bigint) => {
-        timeEnum.value.push(v)
-      })
-      SiteDetail.value.push({
-        site_id: value.site_id,
-        site_name: value.site_name,
-        price: value.price,
-        saas_reserve_time_enum: value.saas_reserve_time_enum,
-        online_reserve_time_enum: value.online_reserve_time_enum,
-      })
+      if (siteName == item) {
+        tmp.data.push({ time_value: element.time_value, price: element.price })
+        showTotal.value += element.price
+      }
     })
-
-    const uniqueArr = [...new Set(timeEnum.value)]
-    const sortedArr = uniqueArr.sort((a: any, b: any) => a - b)
-    sortedArr.forEach((vv: any) => {
-      SiteTimeEnum.value.push({ time: vv })
-    })
-    //处理价格信息
+    if (tmp.data.length > 0) showSeletSite.value.push(tmp)
   })
 }
 
-function getStatus(time: any, data: any) {
-  var status = 0
-  if (currentHour >= TimeEnum.Enum.time_enum[time].split(':')[0]) {
-    status = 1
+const getTagType = (name: string) => {
+  switch (name) {
+    case '线下预定':
+      return 'success'
+    case '线上预定':
+      return 'warning'
+    case '不可预定':
+      return 'info'
+    default:
+      return 'success'
   }
-  if (data.saas_reserve_time_enum.length != 0) {
-    data.saas_reserve_time_enum.forEach((value: any) => {
-      if (value == time) {
-        status = 3
-      }
+}
+
+// 刷新数据
+const updateData = (date: any) => {
+  getSiteReserve({ shop_id: 1, date: date }).then((res: any) => {
+    let postData = res.data.data
+    // 数据清空
+    tableData.value = []
+
+    // 设置列名
+    colNames.value = []
+    postData.forEach((element: any) => {
+      colNames.value.push(element.site_name)
     })
-  }
-  if (data.online_reserve_time_enum.length != 0) {
-    data.online_reserve_time_enum.forEach((value: any) => {
-      if (value == time) {
-        status = 2
-      }
+
+    // 设置数据
+    Object.keys(timeEnums).forEach((key) => {
+      let dataObj = { timeValue: timeEnums[key] } as any
+      let numberKey = Number(key)
+      let tmpId = 0
+
+      postData.forEach((value: any) => {
+        if (value.saas_reserve_time_enum.includes(numberKey)) {
+          dataObj[value.site_name] = '线下预定'
+        } else if (value.online_reserve_time_enum.includes(numberKey)) {
+          dataObj[value.site_name] = '线上预定'
+        } else if (value.store_time_enum.includes(numberKey)) {
+          value.price.forEach((v: any) => {
+            // 可预定场地的信息
+            if (v.time_enum == numberKey) {
+              dataObj[value.site_name] = {
+                id: tmpId,
+                price: v.price,
+                checked: false,
+                site_id: value.site_id,
+                site_name: value.site_name,
+                time_enum: v.time_enum,
+                time_value: timeEnums[v.time_enum],
+              }
+            }
+          })
+        } else {
+          dataObj[value.site_name] = '不可预定'
+        }
+      })
+      tableData.value.push(dataObj)
     })
-  }
-  return status
+  })
 }
 
-function getSiteName(site: any) {
-  return site.site_name
+// 价格格式化
+const formatPrice = (price: number) => {
+  return '￥' + (price / 100.0).toFixed(2)
 }
 
-function getSiteCount(site: any) {
-  return site.time_enum.length
-}
+const submit = async (formEl: FormInstance | undefined) => {
+  if (!formEl || seletSite.value.length == 0) return
+  await formEl.validate((valid) => {
+    if (valid) {
+      var data = reactive<any>({
+        user_name: form.name,
+        user_phone: form.phone,
+        remake: form.remake,
+        shop_id: 1,
+        gmt_site_use: selectDate,
+        site_detail: [],
+      })
+      console.log(seletSite.value)
 
-function getSiteSumMoney(site: any) {
-  let totalMoney = 0
-
-  SiteDetail.value.forEach((value: any) => {
-    if (value.site_id == site.site_id) {
-      site.time_enum.forEach((v: any) => {
-        value.price.forEach((vv: any) => {
-          if (v == vv.time_enum) {
-            totalMoney += vv.price
+      colNames.value.forEach((value: any) => {
+        let tmpSite = { site_id: 0, time_enum: [] as any }
+        seletSite.value.forEach((element: any) => {
+          if (element.site_name == value) {
+            tmpSite.site_id = element.site_id
+            tmpSite.time_enum.push(element.time_enum)
           }
         })
+        if (tmpSite.time_enum.length > 0) data.site_detail.push(tmpSite)
       })
-    }
-  })
-  return totalMoney / 100
-}
 
-function submit() {
-  var data = reactive<any>({
-    user_name: form.name,
-    user_phone: form.phone,
-    remake: form.remake,
-    shop_id: 1,
-    gmt_site_use: selectDate,
-    site_detail: [],
-  })
-  SiteSelectDetail.value.forEach((value: any) => {
-    if (value.time_enum.length > 0) {
-      data.site_detail.push({
-        site_id: value.site_id,
-        time_enum: value.time_enum,
-      })
-    }
-  })
-  SaasAddOrder(data).then((res: any) => {
-    if (res.data.code == 200) {
-      ElMessage({
-        type: 'success',
-        message: '提交成功了，需要付钱:' + res.data.data.money,
-      })
-    }
-  })
-}
-
-function updateSiteDetail(site: any, timeEnum: any) {
-  let jump = 0
-  if (SiteSelectDetail.value.length == 0) {
-    SiteSelectDetail.value.push({
-      site_id: site.site_id,
-      site_name: site.site_name,
-      time_enum: [timeEnum],
-    })
-  } else {
-    SiteSelectDetail.value.forEach((value: any, index: any) => {
-      if (value.site_id == site.site_id) {
-        for (let i = 0; i < value.time_enum.length; i++) {
-          if (value.time_enum[i] == timeEnum) {
-            value.time_enum.splice(i, 1)
-            jump = 1
-            return
-          }
+      addOrder(data).then((res: any) => {
+        if (res.data.code == 200) {
+          ElMessage({
+            type: 'success',
+            message: '提交成功',
+          })
+          updateData(selectDate.value)
+        } else {
+          ElMessage({
+            type: 'error',
+            message: '提交失败',
+          })
         }
-        SiteSelectDetail.value[index].time_enum.push(timeEnum)
-        jump = 1
-      }
-    })
-    if (jump == 0) {
-      SiteSelectDetail.value.push({
-        site_id: site.site_id,
-        site_name: site.site_name,
-        time_enum: [timeEnum],
       })
-    }
-  }
-}
-
-function getMoney(time: any, data: any) {
-  let price = -1
-  data.price.forEach((value: any) => {
-    if (value.time_enum == time) {
-      price = value.price / 100
-      return price
+    } else {
+      // console.log('error submit!', fields)
     }
   })
-  return price
-}
-
-function getTimeEnum(time: any) {
-  return TimeEnum.Enum.time_enum[time].split('~')[1]
-}
-
-function getTimeEnumStart(time: any) {
-  return TimeEnum.Enum.time_enum[time].split('~')[0]
 }
 </script>
 
-<style scoped>
-.my_table >>> .el-table__body tr:hover > td {
-  background-color: #fff !important;
-}
-</style>
 <style lang="scss">
-//.el-table__body{
-//  -webkit-border-horizontal-spacing: 100px;  // 水平间距
-//  -webkit-border-vertical-spacing: -500px;  // 垂直间距
-//}
-.site-main {
+.legend {
   width: 100%;
-  height: 100%;
   display: flex;
-  background-color: #e5e5e5;
-  overflow-y: hidden;
+  margin: 20px 10px;
+  grid-gap: 0.5rem;
+  gap: 0.5rem;
+}
 
-  .left {
-    width: 80%;
-    height: 100%;
-    margin-right: 20px;
+.el-check-box {
+  width: 90px;
+  height: 48px;
+  line-height: 35px;
+  text-align: center;
+}
 
-    .left-top {
-      height: 5%;
-      width: 100%;
-      padding-left: 30px;
-      display: flex;
-      align-items: center;
-      background-color: #ffffff;
-      margin: 10px;
+.left-main {
+  margin: 10px;
+  width: 100%;
 
-      .example-container {
-        width: 3%;
-        height: 40%;
-        margin-left: 2%;
-        margin-right: 1%;
-        background-color: #0077ff;
-
-        .tick {
-          position: absolute;
-          top: 0;
-          right: 0;
-          margin-top: -5px;
-          color: #0077ff;
-        }
-      }
-
-      .example-container-chose {
-        border: solid 1.5px;
-        border-color: #0077ff;
-        position: relative;
-      }
-
-      .text-example {
-        font-size: 13px;
-        margin-top: 3px;
-      }
-    }
-
-    .left-main {
-      background-color: #ffffff;
-      margin: 10px;
-      height: 100%;
-      width: 100%;
-
-      .date-select {
-        padding-left: 10px;
-        display: flex;
-        align-items: center;
-        height: 5%;
-
-        .active {
-          color: #1890ff;
-          border-color: #badeff;
-          background-color: #e8f4ff;
-        }
-      }
-
-      .site-select {
-        width: 100%;
-        height: 100%;
-
-        .my_table {
-          padding: 10px;
-          height: 80vh;
-
-          .time-enum {
-            position: absolute;
-            right: 0;
-            bottom: -9px;
-          }
-
-          .time-enum-start {
-            position: absolute;
-            right: 0;
-            top: 0;
-          }
-        }
-
-        .el-table {
-          --el-table-border-color: '#FFFFFF' !important;
-        }
-      }
-    }
+  .my_table {
+    padding: 10px 0;
+    height: 80vh;
+    --el-table-border-color: '#FFFFFF' !important;
   }
+}
 
-  .right {
-    background-color: #ffffff;
-    width: 20%;
-    height: 100%;
-    padding: 20px;
-    position: relative;
-
-    .right-top {
-      width: 100%;
-      height: 17%;
-    }
-
-    .right-middle {
-      width: 100%;
-      height: 70%;
-
-      .right-middle-show {
-        padding: 10px 25px 10px 25px;
-        width: 100%;
-        height: 8%;
-        background-color: #eff3ff;
-        margin-bottom: 20px;
-
-        .right-middle-show-top {
-          margin-bottom: 4px;
-          font-size: 15px;
-          width: 100%;
-          height: 50%;
-          display: flex;
-          align-items: center;
-        }
-
-        .right-middle-show-bottom {
-          font-size: 13px;
-          height: 50%;
-          width: 100%;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-      }
-    }
-
-    .bill {
-      position: absolute;
-      bottom: 2%;
-      right: 10%;
-      height: 8%;
-      width: 80%;
-
-      .bill-top {
-        display: flex;
-        justify-content: space-between;
-      }
-    }
+.book_info {
+  padding: 0 20px;
+  .right-middle-show {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: #eff3ff;
+    line-height: 2rem;
+    margin-bottom: 10px;
   }
+}
+
+.flex_box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

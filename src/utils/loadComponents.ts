@@ -1,6 +1,5 @@
 import {App} from "vue"
 import ActionBar from "@/components/ActionBar.vue"
-import Pagination from "@/components/Pagination.vue"
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 
@@ -9,7 +8,6 @@ export const loadCommonComponents = (app: App): App => {
     app.component(key, component)
   }
   app.component("ActionBar",ActionBar)
-  app.component("Pagination",Pagination)
 
   return app
 }

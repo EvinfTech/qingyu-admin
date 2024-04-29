@@ -18,6 +18,7 @@ export const useEnumStore = defineStore("enum",{
         },
     }
 })
+
 //下面这些函数是从本地读取，在pinia还没有创建的时候，例如路由钩子
 export const getEnumInfo = (): any => {
     return storage.get(UIK, {})

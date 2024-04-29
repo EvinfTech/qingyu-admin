@@ -58,11 +58,6 @@ const menuRoute: RouteRecordRaw[] = [
         component: () => import('@/views/order/Order.vue'),
         meta: {icon: 'List', title: "订单管理", hideMenu: true}
       },
-      {
-        path: 'order_detail',
-        component: () => import('@/views/order/OrderDetail.vue'),
-        meta: {icon: 'Guide', title: "订单详情", hideMenu: true}
-      },
     ]
   },
   {
@@ -84,7 +79,7 @@ const menuRoute: RouteRecordRaw[] = [
       {
         path: 'book',
         component: () => import('@/views/venue/BookConfig.vue'),
-        meta: {icon: 'Calendar',title: "预约设置"},
+        meta: {icon: 'Calendar',title: "预约设置", hideMenu: true},
       }
     ]
   },
@@ -92,7 +87,7 @@ const menuRoute: RouteRecordRaw[] = [
     path: '/system',
     component: () => import('@/views/layout/MainLayout.vue'),
     redirect: '/system/fastCrudFrom',
-    meta: {icon: 'ElementPlus', title: "系统工具"},
+    meta: {icon: 'ElementPlus', title: "系统工具", hideMenu: false},
     children: [
       {
         path: 'user',
@@ -102,12 +97,12 @@ const menuRoute: RouteRecordRaw[] = [
       {
         path: 'role',
         component: () => import('@/views/system/role/role.vue'),
-        meta: {title: "角色管理"},
+        meta: {title: "角色管理", hideMenu: true},
       },
       {
         path: 'menu',
         component: () => import('@/views/system/menu/menu.vue'),
-        meta: {title: "菜单管理"},
+        meta: {title: "菜单管理", hideMenu: true},
       },
   
     ]

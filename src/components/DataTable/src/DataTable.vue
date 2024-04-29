@@ -51,25 +51,6 @@
           class="filter-item"
           >导出</el-button
         >
-
-        <!-- <el-dropdown
-          v-if="selectedIds.length > 0 && batch"
-          style="margin-left: 10px"
-        >
-          <el-button type="primary" plain>
-            批量操作<el-icon class="el-icon--right"><arrow-down /></el-icon>
-          </el-button>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item
-                :key="index"
-                v-for="(item, index) in batch"
-                @click="onBatch(item)"
-                >{{ item.label }}</el-dropdown-item
-              >
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown> -->
       </div>
 
       <div class="opt-box-right">
@@ -103,8 +84,8 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, toRefs, PropType, ref, unref, watch } from 'vue'
-import { OptionsType, BatchType, TableQueryType } from './types'
+import { onMounted, toRefs, PropType, ref, unref } from 'vue'
+import { OptionsType, TableQueryType } from './types'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import request from '@/utils/request'
 
@@ -114,7 +95,7 @@ const records = ref([])
 const total = ref(0)
 const loading = ref(false)
 const selectedIds = ref([] as any[])
-const selectedRow = ref({})
+const selectedRow = ref({} as any)
 
 // 表格参数
 const props = defineProps({
@@ -136,7 +117,7 @@ const props = defineProps({
 const emit = defineEmits(['onAdd', 'onEdit', 'onDelete', 'onBatch'])
 
 // 解构参数便于处理
-const { listUrl, delUrl, rowKey, add, edit, del, ip, op, batch } = toRefs(
+const { listUrl, delUrl, rowKey, add, edit, del, ip, op } = toRefs(
   props.options
 )
 const { query } = toRefs(props)
@@ -152,7 +133,7 @@ const search = () => {
 // 搜索数据
 const reset = () => {
   // 清空值并搜索
-  // query.value.params = {}
+  query.value.params = { shop_id: 1 }
   search()
 }
 
@@ -161,22 +142,19 @@ const selection = (rows: { id: string }[]) => {
   let ids = [] as any[]
   rows.forEach((row) => {
     ids.push(row.id)
-    console.log('++++选定的：' + row.id)
   })
 
   // 赋值
   selectedIds.value = ids
-  console.log('select', selectedIds.value)
 }
 
 // 最后选择的数据，用于编辑
-const rowSelect = (row) => {
+const rowSelect = (row: any) => {
   selectedRow.value = row
 }
 
 // 添加操作
 const onAdd = () => {
-  console.log('添加操作：' + JSON.stringify(selectedRow.value))
   emit('onAdd', selectedRow.value)
 }
 
@@ -213,50 +191,50 @@ const onDelete = () => {
 }
 
 // 批量操作
-const onBatch = (data: BatchType) => {
-  console.log('批量操作' + JSON.stringify(data))
+// const onBatch = (data: BatchType) => {
+//   console.log('批量操作' + JSON.stringify(data))
 
-  ElMessageBox.confirm('确认要批量操作吗?', '提示信息', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(() => {
-    // 回调数据
-    const result = {
-      ids: selectedIds.value,
-      key: data.key,
-    }
+//   ElMessageBox.confirm('确认要批量操作吗?', '提示信息', {
+//     confirmButtonText: '确认',
+//     cancelButtonText: '取消',
+//     type: 'warning',
+//   }).then(() => {
+//     // 回调数据
+//     const result = {
+//       ids: selectedIds.value,
+//       key: data.key,
+//     }
 
-    // 回调即可
-    emit('onBatch', result)
+//     // 回调即可
+//     emit('onBatch', result)
 
-    // 直接提交数据
-    if (data.action) {
-      let params = data.params || {}
+//     // 直接提交数据
+//     if (data.action) {
+//       let params = data.params || {}
 
-      params[data.idsKey || 'ids'] = selectedIds.value
+//       params[data.idsKey || 'ids'] = selectedIds.value
 
-      // 执行批量操作
-      // request
-      //   .post({
-      //     url: data.action,
-      //     data: params
-      //   })
-      //   .then(() => {
-      //     ElMessage({
-      //       showClose: true,z
-      //       message: '操作成功！',
-      //       type: 'success'
-      //     })
-      //     // 刷新数据
-      //     loadData()
-      //   })
+//       // 执行批量操作
+//       // request
+//       //   .post({
+//       //     url: data.action,
+//       //     data: params
+//       //   })
+//       //   .then(() => {
+//       //     ElMessage({
+//       //       showClose: true,z
+//       //       message: '操作成功！',
+//       //       type: 'success'
+//       //     })
+//       //     // 刷新数据
+//       //     loadData()
+//       //   })
 
-      console.log('提交到：' + data.action)
-      console.log('提交参数：' + JSON.stringify(params))
-    }
-  })
-}
+//       console.log('提交到：' + data.action)
+//       console.log('提交参数：' + JSON.stringify(params))
+//     }
+//   })
+// }
 
 // 刷新数据
 const reload = () => {

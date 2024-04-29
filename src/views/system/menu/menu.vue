@@ -51,10 +51,10 @@
       check-strictly
       default-expand-all
       :expand-on-click-node="false"
-      :filter-node-method="filterNode"
       highlight-current
       @node-drop="handleDrag"
     >
+      <!-- :filter-node-method="filterNode" -->
       <template #default="{ data }">
         <div class="tree-box">
           <div class="tree-item" style="flex-grow: 1">
@@ -429,35 +429,36 @@ const allowDrop = (draggingNode: Node, dropNode: Node, type: AllowDropType) => {
 }
 
 // 执行排序
-const handleDrag = (draggingNode: Node, dropNode: Node, dropType: DropType) => {
-  sortApi({
-    form: draggingNode.data.id,
-    to: dropNode.data.id,
-    dropType: dropType,
-  }).then(() => {
-    ElMessage({
-      showClose: true,
-      message: '排序成功！',
-      type: 'success',
-    })
-
-    loadData()
-  })
+const handleDrag = (draggingNode: Node, dropNode: Node) => {
+  console.log('handleDrag', draggingNode, dropNode)
+  // sortApi({
+  //   form: draggingNode.data.id,
+  //   to: dropNode.data.id,
+  //   dropType: dropType,
+  // }).then(() => {
+  //   ElMessage({
+  //     showClose: true,
+  //     message: '排序成功！',
+  //     type: 'success',
+  //   })
+  //   loadData()
+  // })
 }
 
 const treeRef = ref<InstanceType<typeof ElTree>>()
 
-interface Tree {
-  id: number
-  metaTitle: string
-  children?: Tree[]
-}
+// interface Tree {
+//   id: number
+//   metaTitle: string
+//   children?: Tree[]
+// }
 
 // 树过滤规则
-const filterNode = (value: string, data: Tree) => {
-  if (!value) return true
-  return data.metaTitle.includes(value)
-}
+// todo
+// const filterNode = (value: string, data: Tree, node: Node) => {
+//   if (!value) return true
+//   return data.metaTitle.includes(value)
+// }
 
 // 执行搜索
 const search = () => {

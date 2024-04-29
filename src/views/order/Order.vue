@@ -12,13 +12,19 @@
 
       <template #columns>
         <el-table-column type="selection" width="50px" />
-        <el-table-column prop="order_no" label="订单号" width="300px" />
+        <el-table-column prop="order_no" label="订单号" size="mini" />
         <el-table-column prop="user_name" label="用户名" />
         <el-table-column prop="type" label="类型">
           <template #default="scope">
             {{ getTypeText(scope.row.type) }}
           </template>
         </el-table-column>
+        <el-table-column prop="money" label="金额">
+          <template #default="scope">
+            {{ (scope.row.money / 100).toFixed(2) }}
+          </template>
+        </el-table-column>
+
         <el-table-column prop="status" label="状态">
           <template #default="scope">
             {{ getStatusText(scope.row.status) }}
@@ -33,7 +39,7 @@
               icon="Setting"
               type="primary"
               size="small"
-              @click="showDetail(scope.$index, scope.row)"
+              @click="showDetail(scope.row)"
               >详情</el-button
             >
           </template>
@@ -41,20 +47,22 @@
       </template>
     </data-table>
   </ContentWrap>
+  <el-dialog v-model="dialogFormVisible" title="订单详情">
+    <OrderDetail :order="orderInfo" @onUpdate="onUpdateList"></OrderDetail>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
 import { ContentWrap } from '@/components/ContentWrap'
 import { DataTable } from '@/components/DataTable'
-import { ref, reactive, unref } from 'vue'
+import OrderDetail from '@/views/order/OrderDetail.vue'
+import { ref } from 'vue'
 import type {
   OptionsType,
   TableQueryType,
 } from '@/components/DataTable/src/types'
-// import DictListSelect from '@/components/DictListSelect/src/DictListSelect.vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
+let dialogFormVisible = ref<boolean>(false)
 // 表格查询参数
 let query = ref<TableQueryType>({
   page: 1,
@@ -64,10 +72,10 @@ let query = ref<TableQueryType>({
   },
 })
 
+let orderInfo = ref({} as any)
 // 表格默认参数
 let options = ref<OptionsType>({
   listUrl: '/saas/get/order/list',
-  // delUrl: '/saas/del/role',
   add: {
     enable: false,
     // permission: ['role:add'],
@@ -80,22 +88,6 @@ let options = ref<OptionsType>({
     enable: false,
     // permission: ['role:delete'],
   },
-
-  // 批量操作
-  batch: [
-    {
-      key: 'state',
-      label: '启用',
-      params: { state: 1 },
-      action: '/api/user/state',
-      idsKey: 'userIds',
-    },
-    {
-      key: 'state',
-      label: '禁用',
-      params: { state: 0 },
-    },
-  ],
 })
 
 const tableRef = ref()
@@ -115,11 +107,15 @@ const getTypeText = (index: number) => {
 }
 
 // 查看详情
-const showDetail = (index: number, row: any) => {
-  router.push({
-    path: '/order/order_detail',
-    query: { order: JSON.stringify(row) },
-  })
-  console.log(index, row)
+const showDetail = (row: any) => {
+  orderInfo.value = row
+  console.log(orderInfo.value)
+
+  dialogFormVisible.value = true
+}
+
+const onUpdateList = () => {
+  dialogFormVisible.value = false
+  tableRef.value.reload()
 }
 </script>

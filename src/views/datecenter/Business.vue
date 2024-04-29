@@ -12,7 +12,7 @@ const testData1 = [
     percentage: 50,
   },
   {
-    text: '今日订单总额',
+    text: '今日订单',
     value: 1000,
     oldValue: 2000,
     dValue: -1000,
@@ -33,7 +33,7 @@ const testData1 = [
               <div>{{ item.text }}</div>
               <div>￥ {{ item.value }}</div>
             </div>
-            <el-divider border-style="dashed" />
+            <el-divider border-style="dashed" style="margin: 0" />
             <div>
               <p class="grid_tips">昨日 ￥{{ item.oldValue }}</p>
             </div>
@@ -45,13 +45,13 @@ const testData1 = [
       <OrderChart></OrderChart>
     </div>
 
-    <div class="business_chart2">
+    <div>
       <el-row :gutter="10">
-        <el-col :span="12">
+        <el-col :sm="12" :xs="24">
           <div class="business_chart">
             <AreaChart></AreaChart></div
         ></el-col>
-        <el-col :span="12">
+        <el-col :sm="12" :xs="0">
           <div class="business_chart">
             <PieChart></PieChart></div
         ></el-col>
@@ -68,14 +68,11 @@ const testData1 = [
 
 .business_grid {
   border-radius: 12px;
-  /* background-color: #ebeef4; */
   background-color: #f6f8fa;
   font-size: 14px;
 
   width: 100%;
-  /* padding: 8px 12px; */
   .grid_card {
-    /* width: 700px; */
     border-radius: 6px;
     display: flex;
     flex-direction: column;
@@ -99,6 +96,8 @@ const testData1 = [
 }
 
 .business_chart {
+  margin-top: 10px;
+
   border-radius: 6px;
   background-color: #fff;
   width: 100%;

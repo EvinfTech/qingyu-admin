@@ -96,7 +96,7 @@ import Grant from './components/Grant.vue'
 
 // 表格查询参数
 let query = ref<TableQueryType>({
-  current: 1,
+  page: 1,
   size: 10,
   params: {
     title: '',

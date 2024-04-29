@@ -1,6 +1,6 @@
-export const  baseURL:string = import.meta.env.VITE_BASE_URL
+export const baseURL:string = import.meta.env.VITE_BASE_URL
 
-export const  timeout = 80000
+export const timeout = 80000
 
 export const statusDesc:{[value: number]:string} = {
   400: "请求错误(400)",

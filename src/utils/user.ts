@@ -1,6 +1,6 @@
 import Storage from "good-storage";
 import {tokenKey, userInfoKey} from "@/config/app.ts";
-import {User} from "@/store/user.ts";
+import {User} from "@/stores/user.ts";
 
 
 export function getUserInfo():User {

@@ -1,54 +1,57 @@
 <template>
   <div class="site_main">
     <div>
-      <el-button type="primary" :icon="Plus" @click="createSite()"
+      <el-button
+        type="primary"
+        :icon="Plus"
+        @click="createSite()"
+        class="hidden-xs-only"
         >新增场地</el-button
       >
     </div>
     <div class="hr"></div>
 
-    <el-table :data="tableData" stripe style="width: 100%" border>
-      <el-table-column prop="id" label="场地id" width="80" />
-      <el-table-column prop="name" label="场地名称" width="180" />
-      <el-table-column label="可预约时间" width="180">
+    <el-table :data="tableData" stripe style="width: 100%">
+      <el-table-column prop="name" label="场地名称" />
+      <el-table-column label="可预约时间">
         <template #default="scope">
           <div>
             {{ getWorkTime(scope.row) }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="date" label="忙时时间段" width="180">
+      <el-table-column prop="date" label="忙时时间段">
         <template #default="scope">
           <div>
             {{ getBusyTime(scope.row) }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="free_price" label="闲时价格" width="180">
+      <el-table-column prop="free_price" label="闲时价格">
         <template #default="scope">
           <div>{{ scope.row.free_price / 100 }}元</div>
         </template>
       </el-table-column>
-      <el-table-column prop="busy_price" label="忙时价格" width="180">
+      <el-table-column prop="busy_price" label="忙时价格">
         <template #default="scope">
           <div>{{ scope.row.busy_price / 100 }}元</div>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态" width="180">
+      <el-table-column prop="status" label="状态">
         <template #default="scope">
           <div>
             {{ scope.row.status == 'Y' ? '正常' : '不可用' }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="weekend_busy" label="周末是否为忙时" width="180">
+      <el-table-column prop="weekend_busy" label="周末是否为忙时">
         <template #default="scope">
           <div>
             {{ scope.row.weekend_busy == 1 ? '是' : '否' }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="holiday_busy" label="假期是否为忙时" width="180">
+      <el-table-column prop="holiday_busy" label="假期是否为忙时">
         <template #default="scope">
           <div>
             {{ scope.row.holiday_busy == 1 ? '是' : '否' }}
@@ -58,22 +61,27 @@
       <el-table-column prop="data_busy" label="特殊忙时日期" />
       <el-table-column label="操作" width="120">
         <template #default="scope">
-          <el-button @click="edit(scope.row)">查看\编辑</el-button>
+          <el-button @click="edit(scope.row)">更新</el-button>
         </template>
       </el-table-column>
     </el-table>
   </div>
 
   <el-dialog
+    class="form_box"
     v-model="dialogFormVisible"
     :title="func == 'create' ? '创建场地' : '更新场地'"
-    width="30%"
   >
-    <el-form :model="form">
-      <el-form-item label="场地名称" :label-width="formLabelWidth">
+    <el-form
+      :model="form"
+      label-position="top"
+      :rules="rules"
+      ref="ruleFormRef"
+    >
+      <el-form-item label="场地名称" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item label="可预约时间" :label-width="formLabelWidth">
+      <el-form-item label="可预约时间" prop="site_start_time">
         <div class="demo-time-range">
           <el-time-select
             v-model="form.site_start_time"
@@ -81,61 +89,61 @@
             step="00:30"
             end="23:30"
             @change="siteStartTimeChange()"
-            placeholder="Select time"
+            placeholder="选择时间"
           />
           <el-time-select
             v-model="form.site_end_time"
             :start="form.site_start_time"
-            step="01:00"
+            step="00:30"
             end="23:30"
-            placeholder="Select time"
+            placeholder="选择时间"
           />
         </div>
       </el-form-item>
-      <el-form-item label="忙时时间段" :label-width="formLabelWidth">
+      <el-form-item label="忙时时间段" prop="busy_start_time">
         <div class="demo-time-range">
           <el-time-select
             v-model="form.busy_start_time"
             start="1:00"
             step="00:30"
             end="23:30"
-            placeholder="Select time"
+            placeholder="选择时间"
           />
           <el-time-select
             v-model="form.busy_end_time"
             start="1:00"
             step="00:30"
             end="23:30"
-            placeholder="Select time"
+            placeholder="选择时间"
           />
         </div>
       </el-form-item>
-      <el-form-item label="闲时价格" :label-width="formLabelWidth">
+      <el-form-item label="闲时价格" prop="free_price">
         <el-input v-model="form.free_price" />
       </el-form-item>
-      <el-form-item label="忙时价格" :label-width="formLabelWidth">
+      <el-form-item label="忙时价格" prop="busy_price">
         <el-input v-model="form.busy_price" />
       </el-form-item>
-      <el-form-item label="状态" :label-width="formLabelWidth">
+      <el-form-item label="状态">
         <!--        <el-input v-model="form.status"/>-->
         <el-radio-group v-model="form.status" class="ml-4">
-          <el-radio label="Y" size="large">正常</el-radio>
-          <el-radio label="N" size="large">关闭</el-radio>
+          <el-radio value="Y" size="large">正常</el-radio>
+          <el-radio value="N" size="large">关闭</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="周末是否为忙时" :label-width="formLabelWidth">
+      <el-form-item label="周末是否为忙时">
         <el-radio-group v-model="form.weekend_busy" class="ml-4">
-          <el-radio :label="1" size="large">是</el-radio>
-          <el-radio :label="0" size="large">否</el-radio>
+          <el-radio :value="1" size="large">是</el-radio>
+          <el-radio :value="0" size="large">否</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="假期是否为忙时" :label-width="formLabelWidth">
+      <el-form-item label="假期是否为忙时">
         <el-radio-group v-model="form.holiday_busy" class="ml-4">
-          <el-radio :label="1" size="large">是</el-radio>
-          <el-radio :label="0" size="large">否</el-radio>
+          <el-radio :value="1" size="large">是</el-radio>
+          <el-radio :value="0" size="large">否</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="特殊忙时日期" :label-width="formLabelWidth">
+      <el-form-item label="特殊忙时日期">
         <el-input v-model="form.data_busy" />
       </el-form-item>
     </el-form>
@@ -143,43 +151,112 @@
       <span class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button @click="delSite()" type="danger">删除</el-button>
-        <el-button type="primary" @click="submitForm()"> 提交 </el-button>
+        <el-button type="primary" @click="submit(ruleFormRef)">
+          提交
+        </el-button>
       </span>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, reactive } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import {
   saasAddSite,
-  SaasDelSite,
+  saasDelSite,
   saasGetSiteList,
   saasUpdateSite,
 } from '@/api/venue'
-import { useEnumStore } from '@/stores/enum.ts'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import 'element-plus/theme-chalk/display.css'
+import type { FormRules, FormInstance } from 'element-plus'
 
 const tableData = ref<any[]>([])
-const TimeEnum = useEnumStore()
 let dialogFormVisible = ref<boolean>(false)
-let formLabelWidth = '150px'
 let func = ''
 
 let form = ref<any>({
   site_start_time: '',
   site_end_time: '',
 })
+
+const ruleFormRef = ref<FormInstance>()
+const rules = reactive<FormRules<any>>({
+  name: [
+    {
+      required: true,
+      message: '请输入场馆名称',
+      trigger: 'change',
+    },
+  ],
+  busy_price: [
+    {
+      required: true,
+      message: '请输入忙时价格',
+      trigger: 'change',
+    },
+  ],
+  free_price: [
+    {
+      required: true,
+      message: '请输入闲时价格',
+      trigger: 'change',
+    },
+  ],
+  site_start_time: [
+    {
+      required: true,
+      message: '请选择可预约开始时间',
+      trigger: 'change',
+    },
+  ],
+  site_end_time: [
+    {
+      required: true,
+      message: '请选择可预约结束时间',
+      trigger: 'change',
+    },
+  ],
+  busy_start_time: [
+    {
+      required: true,
+      message: '请选择忙时开始时间',
+      trigger: 'change',
+    },
+  ],
+  busy_end_time: [
+    {
+      required: true,
+      message: '请选择忙时结束时间',
+      trigger: 'change',
+    },
+  ],
+})
+
 onMounted(() => {
+  updateInfo()
+})
+
+const updateInfo = () => {
   saasGetSiteList({ shop_id: 1 }).then((res: any) => {
     tableData.value = res.data.data
     console.log('表数据', tableData.value)
   })
-  console.log('枚举数据', TimeEnum.Enum.time_enum[8])
-})
+}
 
-function submitForm() {
+const submit = async (formEl: any) => {
+  if (!formEl) return
+  await formEl.validate((valid: any, fields: any) => {
+    if (valid) {
+      submitForm()
+    } else {
+      console.log('error submit!', fields)
+    }
+  })
+}
+
+const submitForm = () => {
   dialogFormVisible.value = false
   form.value.free_price = form.value.free_price * 100
   form.value.busy_price = form.value.busy_price * 100
@@ -191,9 +268,9 @@ function submitForm() {
           type: 'success',
           message: '操作成功',
         })
+        updateInfo()
       }
     })
-    location.reload()
   }
   if (func == 'create') {
     console.log(form.value)
@@ -204,35 +281,29 @@ function submitForm() {
           type: 'success',
           message: '操作成功',
         })
-        // location.reload()
+        updateInfo()
       }
     })
   }
 }
 
-function delSite() {
+const delSite = () => {
   ElMessageBox.confirm('你确定要删除吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-    SaasDelSite({ site_id: form.value.id }).then((res: any) => {
-      console.log(res)
+    saasDelSite({ site_id: form.value.id }).then((res: any) => {
       if (res.data.code == 200) {
-        location.reload()
         ElMessage({
           type: 'success',
           message: '删除成功',
         })
+        dialogFormVisible.value = false
+        updateInfo()
       }
     })
   })
-  // .catch(() => {
-  //   ElMessage({
-  //     type: 'info',
-  //     message: 'Delete canceled',
-  //   })
-  // })
 }
 
 function getWorkTime(data: any) {
@@ -243,7 +314,6 @@ function createSite() {
   func = 'create'
   dialogFormVisible.value = true
   form = ref<any>({})
-  console.log('我看看清空了没', form)
 }
 
 function getBusyTime(data: any) {
@@ -262,14 +332,6 @@ function edit(data: any) {
   form.value = copyObj1
   form.value.free_price = copyObj1.free_price / 100
   form.value.busy_price = copyObj1.busy_price / 100
-  console.log(form)
-  // watch(() => form.value.site_start_time, (newValue, oldValue) => {
-  //   console.log("监听成功", newValue.site_start_time, oldValue.site_start_time)
-  //   form.value.site_end_time = ''
-  //
-  // }, {
-  //   deep: true
-  // })
 }
 
 function copyObj(obj: any): any {
@@ -292,6 +354,12 @@ function copyObj(obj: any): any {
 }
 </script>
 
+<style>
+.el-dialog {
+  min-width: 350px;
+}
+</style>
+
 <style scoped lang="scss">
 .site_main {
   padding: 10px 30px;
@@ -302,6 +370,16 @@ function copyObj(obj: any): any {
     height: 3px;
     width: 100%;
     background-color: #8c939d;
+  }
+}
+
+.form_box {
+  padding: 30px;
+  .demo-time-range {
+    width: 100%;
+    display: flex;
+    grid-gap: 0.5rem;
+    gap: 0.5rem;
   }
 }
 </style>

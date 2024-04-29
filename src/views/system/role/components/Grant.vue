@@ -156,7 +156,7 @@ const nodeClass = (data: any) => {
   if (data.menuType === 2 && data.children && data.children.length > 0) {
     return 'is-menu'
   }
-  return null
+  return ''
 }
 
 // 加载第一页数据

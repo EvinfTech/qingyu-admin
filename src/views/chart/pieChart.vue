@@ -5,33 +5,35 @@ import * as echarts from 'echarts'
 type EChartsOption = echarts.EChartsOption
 
 var chartDom
-var myChart
+var myChart: any
 var option: EChartsOption
 
 option = {
   title: {
-    text: 'Referer of a Website',
-    subtext: 'Fake Data',
+    text: '订票来源占比',
     left: 'center',
+    top: '10',
   },
   tooltip: {
     trigger: 'item',
   },
   legend: {
     orient: 'vertical',
-    left: 'left',
+    // left: 'left',
+    left: '10',
+    top: '10',
   },
   series: [
     {
       name: 'Access From',
       type: 'pie',
       radius: '50%',
+
       data: [
-        { value: 1048, name: 'Search Engine' },
-        { value: 735, name: 'Direct' },
-        { value: 580, name: 'Email' },
-        { value: 484, name: 'Union Ads' },
-        { value: 300, name: 'Video Ads' },
+        { value: 1048, name: '线上预定' },
+        { value: 735, name: '电话预定' },
+        { value: 580, name: '线下预定' },
+        { value: 484, name: '其他' },
       ],
       emphasis: {
         itemStyle: {
@@ -43,6 +45,12 @@ option = {
     },
   ],
 }
+
+// 为窗口大小变化添加事件监听器
+window.addEventListener('resize', function () {
+  myChart.resize()
+})
+
 onMounted(() => {
   chartDom = document.getElementById('main3')!
   myChart = echarts.init(chartDom)

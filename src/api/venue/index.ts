@@ -1,14 +1,14 @@
 import  r  from "@/utils/request.ts"
 
 
-export function paginationList(data:any)  {
+export function getShopDetail(data:any)  {
     return r.request<string[]>({//r.request会做拦截，因此响应的数据就是string[] 类型
         url: '/saas/get/shop/detail',
         method: 'post',
         data,
     })
 }
-export function saasUpdateShopDetail(data:any)  {
+export function updateShopDetail(data:any)  {
     return r.request<string[]>({//r.request会做拦截，因此响应的数据就是string[] 类型
         url: '/saas/update/shop/detail',
         method: 'post',
@@ -36,7 +36,7 @@ export function saasAddSite(data:any)  {
         data,
     })
 }
-export function SaasDelSite(data:any)  {
+export function saasDelSite(data:any)  {
     return r.request<string[]>({//r.request会做拦截，因此响应的数据就是string[] 类型
         url: '/saas/del/site',
         method: 'post',

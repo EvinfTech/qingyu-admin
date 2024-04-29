@@ -5,7 +5,7 @@ import * as echarts from 'echarts'
 type EChartsOption = echarts.EChartsOption
 
 var chartDom
-var myChart
+var myChart: any
 var option: EChartsOption
 
 option = {
@@ -16,7 +16,9 @@ option = {
       type: 'shadow', // 'shadow' as default; can also be 'line' or 'shadow'
     },
   },
-  legend: {},
+  legend: {
+    top: '10',
+  },
   grid: {
     left: '3%',
     right: '4%',
@@ -25,14 +27,14 @@ option = {
   },
   xAxis: {
     type: 'category',
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
   },
   yAxis: {
     type: 'value',
   },
   series: [
     {
-      name: 'Direct',
+      name: '1号场',
       type: 'bar',
       stack: 'total',
       label: {
@@ -44,7 +46,7 @@ option = {
       data: [320, 302, 301, 334, 390, 330, 320],
     },
     {
-      name: 'Mail Ad',
+      name: '2号场',
       type: 'bar',
       stack: 'total',
       label: {
@@ -56,7 +58,7 @@ option = {
       data: [120, 132, 101, 134, 90, 230, 210],
     },
     {
-      name: 'Affiliate Ad',
+      name: '3号场',
       type: 'bar',
       stack: 'total',
       label: {
@@ -68,7 +70,7 @@ option = {
       data: [220, 182, 191, 234, 290, 330, 310],
     },
     {
-      name: 'Video Ad',
+      name: '4号场',
       type: 'bar',
       stack: 'total',
       label: {
@@ -80,7 +82,7 @@ option = {
       data: [150, 212, 201, 154, 190, 330, 410],
     },
     {
-      name: 'Search Engine',
+      name: '5号场',
       type: 'bar',
       stack: 'total',
       label: {
@@ -93,6 +95,11 @@ option = {
     },
   ],
 }
+
+// 为窗口大小变化添加事件监听器
+window.addEventListener('resize', function () {
+  myChart.resize()
+})
 
 onMounted(() => {
   chartDom = document.getElementById('main')!

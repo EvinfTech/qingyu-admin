@@ -25,7 +25,6 @@ const menu = (routes: RouteRecordRaw[]): RouteRecordRaw[] => {
     }
   })
 
-  console.log(result)
   return result
 }
 

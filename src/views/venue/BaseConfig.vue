@@ -1,145 +1,153 @@
 <template>
   <div class="info_main">
-    <h1>场馆信息</h1>
-    <div class="info_box">
-      <p>场馆名称</p>
-      <el-input v-model="form.shop_name" placeholder="Please input" />
-      <p>场馆头像</p>
-      <el-upload
-        class="avatar-uploader"
-        action="http://172.16.7.99:8002/upload/common"
-        :show-file-list="false"
-        :on-preview="handlePictureCardPreview"
-        :on-success="handleAvatarSuccess"
-        :before-upload="beforeAvatarUpload"
-      >
-        <img v-if="form.shop_avatar" :src="form.shop_avatar" class="avatar" />
-        <el-icon v-else class="avatar-uploader-icon">
-          <Plus />
-        </el-icon>
-      </el-upload>
-      <p class="tips">允许单张jpg/png 文件，最大不超过 500KB.</p>
+    <el-form
+      style="max-width: 1000px"
+      :model="form"
+      label-width="auto"
+      label-position="top"
+      size="large"
+    >
+      <el-form-item label="场馆名称">
+        <el-input v-model="form.name" />
+      </el-form-item>
+      <el-form-item label="场馆头像">
+        <el-upload
+          class="avatar-uploader"
+          :action="uploadAvatarUrl"
+          :show-file-list="false"
+          :on-preview="handlePictureCardPreview"
+          :on-success="handleAvatarSuccess"
+          :before-upload="beforeAvatarUpload"
+        >
+          <img
+            v-if="form.avatar"
+            :src="baseURL + '/' + form.avatar"
+            class="avatar"
+          />
+          <el-icon v-else class="avatar-uploader-icon">
+            <Plus />
+          </el-icon>
+        </el-upload>
+        <p class="tips">允许单张jpg/png 文件，最大不超过 500KB.</p>
+      </el-form-item>
+      <el-form-item label="场馆相册">
+        <el-upload
+          :file-list="fileList"
+          :action="uploadPhotoUrl"
+          list-type="picture-card"
+          :on-preview="handlePictureCardPreview"
+          :on-remove="handleRemove"
+          :on-success="handleSuccess"
+        >
+          <el-icon>
+            <Plus />
+          </el-icon>
+        </el-upload>
 
-      <p>场馆相册</p>
+        <el-dialog v-model="dialogVisible">
+          <img w-full :src="dialogImageUrl" alt="Preview Image" />
+        </el-dialog>
+        <p class="tips">允许上传多张jpg/png 文件，最大不超过 500KB.</p>
+      </el-form-item>
+      <el-form-item label="场馆电话">
+        <el-input v-model="form.phone" />
+      </el-form-item>
+      <el-form-item label="场馆地址">
+        <el-input v-model="form.address" />
+      </el-form-item>
+      <el-form-item label="营业时间">
+        <el-input v-model="form.work_time" />
+      </el-form-item>
+      <el-form-item label="标签">
+        <div class="mx-1">
+          <el-tag
+            v-for="tag in tags"
+            :key="tag"
+            closable
+            :disable-transitions="false"
+            @close="handleClose(tag)"
+          >
+            {{ tag }}
+          </el-tag>
+          <el-input
+            v-if="inputVisible"
+            ref="InputRef"
+            v-model="inputValue"
+            class="ml-1 w-20"
+            size="small"
+            @keyup.enter="handleInputConfirm"
+            @blur="handleInputConfirm"
+          />
+          <el-button
+            v-else
+            class="button-new-tag ml-1"
+            size="default"
+            @click="showInput"
+          >
+            + 添加新标签
+          </el-button>
+        </div>
+      </el-form-item>
+      <el-form-item label="场馆简介">
+        <el-input
+          v-model="form.desc"
+          :autosize="{ minRows: 2, maxRows: 4 }"
+          type="textarea"
+          placeholder="介绍一下你的场馆吧"
+        />
+      </el-form-item>
+    </el-form>
 
-      <el-upload
-        :file-list="fileList"
-        action="http://172.16.7.99:8002/upload/common"
-        list-type="picture-card"
-        :on-preview="handlePictureCardPreview"
-        :on-remove="handleRemove"
-        :on-success="handleSuccess"
-      >
-        <el-icon>
-          <Plus />
-        </el-icon>
-      </el-upload>
-
-      <el-dialog v-model="dialogVisible">
-        <img w-full :src="dialogImageUrl" alt="Preview Image" />
-      </el-dialog>
-      <p class="tips">允许上传多张jpg/png 文件，最大不超过 500KB.</p>
-
-      <p>场馆电话</p>
-      <el-input v-model="form.shop_phone" placeholder="Please input" />
-
-      <p>场馆地址</p>
-      <el-input v-model="form.shop_address" placeholder="Please input" />
-
-      <p>营业时间</p>
-      <el-input v-model="form.work_time" placeholder="Please input" />
-
-      <p>标签选择</p>
-      <el-checkbox-group v-model="tags">
-        <el-checkbox label="停车场" />
-        <el-checkbox label="24小时热水" />
-        <el-checkbox label="淋浴房" />
-        <el-checkbox label="不让你选" disabled />
-        <!--        <el-checkbox label="selected and disabled" disabled/>-->
-      </el-checkbox-group>
-
-      <p>自定义标签</p>
-      <el-tag
-        v-for="tag in dynamicTags"
-        :key="tag"
-        class="mx-1"
-        closable
-        :disable-transitions="false"
-        @close="handleClose(tag)"
-      >
-        {{ tag }}
-      </el-tag>
-      <el-input
-        v-if="inputVisible"
-        ref="InputRef"
-        v-model="inputValue"
-        class="ml-1 w-20"
-        size="small"
-        @keyup.enter="handleInputConfirm"
-        @blur="handleInputConfirm"
-      />
-      <el-button
-        v-else
-        class="button-new-tag ml-1"
-        size="small"
-        @click="showInput"
-      >
-        + New Tag
-      </el-button>
-
-      <p>场馆简介</p>
-      <el-input
-        v-model="form.desc"
-        :autosize="{ minRows: 2, maxRows: 4 }"
-        type="textarea"
-        placeholder="Please input"
-      />
-    </div>
-
-    <h1>预约设置</h1>
+    <!-- <h1>预约设置</h1>
     <div class="info_box">
       <p>可预约的时间段</p>
       <el-input v-model="form.demo" placeholder="Please input" />
       <p>允许提前预约的天数</p>
       <el-input-number v-model="form.demo" :step="1" />
-    </div>
-    <el-button @click="submit">提交</el-button>
+    </div> -->
+    <el-button
+      @click="submit"
+      type="primary"
+      style="width: 100%; max-width: 1000px; height: 40%; margin-top: 20px"
+      >提交</el-button
+    >
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, reactive, onMounted } from 'vue'
+import { ref, nextTick, onMounted, reactive } from 'vue'
 import { ElMessage, ElInput } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { UploadProps, UploadUserFile } from 'element-plus'
-import { paginationList, saasUpdateShopDetail } from '@/api/venue'
+import { getShopDetail, updateShopDetail } from '@/api/venue'
+import { baseURL } from '@/config/request.ts'
 
 let form = reactive({
-  shop_id: 1,
-  shop_name: '',
-  shop_avatar: '',
-  shop_photo: [],
-  shop_phone: '',
-  shop_address: '',
+  id: 1,
+  name: '',
+  avatar: '',
+  photo: [],
+  phone: '',
+  address: '',
   work_time: '',
   tag: [],
-  demo: '',
+  demo: 0,
   desc: '',
 }) as any
+
 // 多图片列表
 const fileList = ref<UploadUserFile[]>([])
 
-// 标签选项
 const tags = ref<string[]>([])
-//自定义标签
-// 自定义标签
-const dynamicTags = ref<string[]>([])
 const inputValue = ref('')
 const inputVisible = ref(false)
 const InputRef = ref<InstanceType<typeof ElInput>>()
 
+const uploadPhotoUrl = baseURL + '/common/upload/photo'
+const uploadAvatarUrl = baseURL + '/common/upload/avatar'
+
 const handleAvatarSuccess: UploadProps['onSuccess'] = (res: any) => {
-  form.shop_avatar = res.data
+  form.avatar = res.data
 }
 
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile: any) => {
@@ -151,34 +159,23 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile: any) => {
 }
 
 onMounted(() => {
-  paginationList({ shop_id: 1 }).then((res: any) => {
-    form.shop_name = res.data.data.name
-    form.shop_avatar = res.data.data.avatar
-    // form.shop_photo = res.data.data.photo
-    form.shop_address = res.data.data.address
-    form.shop_phone = res.data.data.phone
-    form.work_time = res.data.data.work_time
-    form.tag = res.data.data.tag
-    res.data.data.photo.forEach((value: any) => {
-      fileList.value.push({ url: value })
-    })
-    tagInit(res.data.data.tag)
-  })
+  getShop()
 })
 
-function tagInit(tag: any) {
-  if (tag.indexOf('停车场') != -1) {
-    tags.value.push('停车场')
-  }
-  if (tag.indexOf('24小时热水') != -1) {
-    tags.value.push('24小时热水')
-  }
-  if (tag.indexOf('淋浴房') != -1) {
-    tags.value.push('淋浴房')
-  }
-  tag.forEach((value: string) => {
-    if (value != '停车场' && value != '24小时热水' && value != '淋浴房') {
-      dynamicTags.value.push(value)
+const getShop = () => {
+  getShopDetail({ shop_id: 1 }).then((res: any) => {
+    let data = res.data.data
+    form.name = data.name
+    form.avatar = data.avatar
+    form.address = data.address
+    form.phone = data.phone
+    form.work_time = data.work_time
+    tags.value = data.tag
+    fileList.value = []
+    if (data.photo.length > 0) {
+      data.photo.forEach((value: any) => {
+        fileList.value.push({ name: '', url: baseURL + '/' + value })
+      })
     }
   })
 }
@@ -194,7 +191,8 @@ const handleRemove: UploadProps['onRemove'] = (
 }
 
 const handleSuccess: UploadProps['onSuccess'] = (uploadFile: any) => {
-  fileList.value.push({ url: uploadFile.data })
+  console.log(uploadFile.data)
+  fileList.value.push({ name: '', url: uploadFile.data })
 }
 
 const handlePictureCardPreview: UploadProps['onPreview'] = (
@@ -204,7 +202,7 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (
   dialogVisible.value = true
 }
 const handleClose = (tag: string) => {
-  dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1)
+  tags.value.splice(tags.value.indexOf(tag), 1)
 }
 
 const showInput = () => {
@@ -216,31 +214,29 @@ const showInput = () => {
 
 const handleInputConfirm = () => {
   if (inputValue.value) {
-    dynamicTags.value.push(inputValue.value)
+    tags.value.push(inputValue.value)
   }
   inputVisible.value = false
   inputValue.value = ''
 }
 
 function submit() {
-  form.shop_photo = []
+  form.photo = []
   fileList.value.forEach((value) => {
-    form.shop_photo.push(value.url)
+    form.photo.push(value.url?.replace(baseURL + '/', ''))
   })
   form.tag = []
   tags.value.forEach((value) => {
     form.tag.push(value)
   })
-  dynamicTags.value.forEach((value) => {
-    form.tag.push(value)
-  })
 
-  saasUpdateShopDetail(form).then((res: any) => {
+  updateShopDetail(form).then((res: any) => {
+    console.log(res.data)
     if (res.data.code == 200) {
       ElMessage({ message: '更新成功', type: 'success' })
+      getShop()
     }
   })
-  location.reload()
 }
 </script>
 
@@ -249,8 +245,6 @@ function submit() {
   padding: 10px 30px;
 
   .info_box {
-    padding: 0 30px;
-
     .tips {
       color: #606266;
       font-size: 12px;
@@ -260,6 +254,13 @@ function submit() {
   .info_box p {
     color: #303133;
   }
+}
+
+.mx-1 {
+  display: flex;
+
+  grid-gap: 0.5rem;
+  gap: 0.5rem;
 }
 
 .avatar-uploader .avatar {
