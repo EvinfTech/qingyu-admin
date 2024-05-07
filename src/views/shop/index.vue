@@ -58,7 +58,7 @@
       <el-form-item label="营业时间">
         <el-input v-model="form.work_time" />
       </el-form-item>
-      <el-form-item label="标签">
+      <!-- <el-form-item label="标签">
         <div class="mx-1">
           <el-tag
             v-for="tag in tags"
@@ -87,6 +87,12 @@
             + 添加新标签
           </el-button>
         </div>
+      </el-form-item> -->
+      <el-form-item label="场馆设施">
+        <el-input v-model="form.facility" />
+      </el-form-item>
+      <el-form-item label="场馆服务">
+        <el-input v-model="form.serve" />
       </el-form-item>
       <el-form-item label="场馆简介">
         <el-input
@@ -115,33 +121,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { ElMessage, ElInput } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { UploadProps, UploadUserFile } from 'element-plus'
-import { getShopDetail, updateShopDetail } from '@/api/venue'
+import { getShopDetail, updateShopDetail } from '@/api/shop'
 import { baseURL } from '@/config/request.ts'
 
 let form = reactive({
   id: 1,
   name: '',
   avatar: '',
-  photo: [],
-  phone: '',
   address: '',
   work_time: '',
-  tag: [],
-  demo: 0,
+  phone: '',
+  photo: [],
+  // tag: [],
   desc: '',
+  facility: 0,
+  serve: '',
 }) as any
 
 // 多图片列表
 const fileList = ref<UploadUserFile[]>([])
 
 const tags = ref<string[]>([])
-const inputValue = ref('')
-const inputVisible = ref(false)
-const InputRef = ref<InstanceType<typeof ElInput>>()
 
 const uploadPhotoUrl = baseURL + '/common/upload/photo'
 const uploadAvatarUrl = baseURL + '/common/upload/avatar'
@@ -170,7 +174,10 @@ const getShop = () => {
     form.address = data.address
     form.phone = data.phone
     form.work_time = data.work_time
-    tags.value = data.tag
+    form.desc = data.desc
+    form.facility = data.facility
+    form.serve = data.serve
+    // tags.value = data.tag
     fileList.value = []
     if (data.photo.length > 0) {
       data.photo.forEach((value: any) => {
@@ -201,26 +208,8 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (
   dialogImageUrl.value = uploadFile.url!
   dialogVisible.value = true
 }
-const handleClose = (tag: string) => {
-  tags.value.splice(tags.value.indexOf(tag), 1)
-}
 
-const showInput = () => {
-  inputVisible.value = true
-  nextTick(() => {
-    InputRef.value!.input!.focus()
-  })
-}
-
-const handleInputConfirm = () => {
-  if (inputValue.value) {
-    tags.value.push(inputValue.value)
-  }
-  inputVisible.value = false
-  inputValue.value = ''
-}
-
-function submit() {
+const submit = () => {
   form.photo = []
   fileList.value.forEach((value) => {
     form.photo.push(value.url?.replace(baseURL + '/', ''))
@@ -238,6 +227,28 @@ function submit() {
     }
   })
 }
+
+// const inputValue = ref('')
+// const inputVisible = ref(false)
+// const InputRef = ref<InstanceType<typeof ElInput>>()
+// const handleClose = (tag: string) => {
+//   tags.value.splice(tags.value.indexOf(tag), 1)
+// }
+
+// const showInput = () => {
+//   inputVisible.value = true
+//   nextTick(() => {
+//     InputRef.value!.input!.focus()
+//   })
+// }
+
+// const handleInputConfirm = () => {
+//   if (inputValue.value) {
+//     tags.value.push(inputValue.value)
+//   }
+//   inputVisible.value = false
+//   inputValue.value = ''
+// }
 </script>
 
 <style scoped>
@@ -290,3 +301,4 @@ function submit() {
   text-align: center;
 }
 </style>
+@/api/shop

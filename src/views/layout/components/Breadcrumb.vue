@@ -7,14 +7,13 @@ const route = useRoute()
 <template>
   <el-breadcrumb class="breadcrumb" separator="/">
     <el-breadcrumb-item
-        v-for="b in route.matched"
-        :key="b.path"
-        :to="{ path: b.path }">
+      v-for="(b, index) in route.matched"
+      :key="index"
+      :to="{ path: b.path }"
+    >
       {{ b.meta.title }}
     </el-breadcrumb-item>
   </el-breadcrumb>
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

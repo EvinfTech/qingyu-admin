@@ -28,7 +28,7 @@ export const routerHook = (router: Router): Router => {
   });
 
   router.afterEach((to, _from) => {
-    console.log(to)
+    // console.log(to)
     nprogress.done();
   });
 

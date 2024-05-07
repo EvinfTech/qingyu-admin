@@ -51,14 +51,6 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="holiday_busy" label="假期是否为忙时">
-        <template #default="scope">
-          <div>
-            {{ scope.row.holiday_busy == 1 ? '是' : '否' }}
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="data_busy" label="特殊忙时日期" />
       <el-table-column label="操作" width="120">
         <template #default="scope">
           <el-button @click="edit(scope.row)">更新</el-button>
@@ -85,17 +77,17 @@
         <div class="demo-time-range">
           <el-time-select
             v-model="form.site_start_time"
-            start="1:00"
-            step="00:30"
-            end="23:30"
+            start="00:00"
+            step="01:00"
+            end="24:00"
             @change="siteStartTimeChange()"
             placeholder="选择时间"
           />
           <el-time-select
             v-model="form.site_end_time"
             :start="form.site_start_time"
-            step="00:30"
-            end="23:30"
+            step="01:00"
+            end="24:00"
             placeholder="选择时间"
           />
         </div>
@@ -104,16 +96,16 @@
         <div class="demo-time-range">
           <el-time-select
             v-model="form.busy_start_time"
-            start="1:00"
-            step="00:30"
+            start="00:00"
+            step="01:00"
             end="23:30"
             placeholder="选择时间"
           />
           <el-time-select
             v-model="form.busy_end_time"
-            start="1:00"
-            step="00:30"
-            end="23:30"
+            start="00:00"
+            step="01:00"
+            end="24:00"
             placeholder="选择时间"
           />
         </div>
@@ -137,20 +129,11 @@
           <el-radio :value="0" size="large">否</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="假期是否为忙时">
-        <el-radio-group v-model="form.holiday_busy" class="ml-4">
-          <el-radio :value="1" size="large">是</el-radio>
-          <el-radio :value="0" size="large">否</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="特殊忙时日期">
-        <el-input v-model="form.data_busy" />
-      </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button @click="delSite()" type="danger">删除</el-button>
+        <el-button @click="delSiteOp()" type="danger">删除</el-button>
         <el-button type="primary" @click="submit(ruleFormRef)">
           提交
         </el-button>
@@ -162,12 +145,7 @@
 <script setup lang="ts">
 import { onMounted, ref, reactive } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import {
-  saasAddSite,
-  saasDelSite,
-  saasGetSiteList,
-  saasUpdateSite,
-} from '@/api/venue'
+import { getSiteList, addSite, delSite, updateSite } from '@/api/site'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import 'element-plus/theme-chalk/display.css'
 import type { FormRules, FormInstance } from 'element-plus'
@@ -239,7 +217,7 @@ onMounted(() => {
 })
 
 const updateInfo = () => {
-  saasGetSiteList({ shop_id: 1 }).then((res: any) => {
+  getSiteList({ shop_id: 1 }).then((res: any) => {
     tableData.value = res.data.data
     console.log('表数据', tableData.value)
   })
@@ -262,7 +240,7 @@ const submitForm = () => {
   form.value.busy_price = form.value.busy_price * 100
 
   if (func == 'update') {
-    saasUpdateSite(form.value).then((res: any) => {
+    updateSite(form.value).then((res: any) => {
       if (res.data.code == 200) {
         ElMessage({
           type: 'success',
@@ -275,7 +253,7 @@ const submitForm = () => {
   if (func == 'create') {
     console.log(form.value)
     form.value.shop_id = 1
-    saasAddSite(form.value).then((res: any) => {
+    addSite(form.value).then((res: any) => {
       if (res.data.code == 200) {
         ElMessage({
           type: 'success',
@@ -287,13 +265,13 @@ const submitForm = () => {
   }
 }
 
-const delSite = () => {
+const delSiteOp = () => {
   ElMessageBox.confirm('你确定要删除吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-    saasDelSite({ site_id: form.value.id }).then((res: any) => {
+    delSite({ site_id: form.value.id }).then((res: any) => {
       if (res.data.code == 200) {
         ElMessage({
           type: 'success',

@@ -9,55 +9,6 @@
       <el-button icon="RefreshLeft" @click="reset()">重置</el-button>
     </div>
 
-    <div class="opt-box">
-      <div class="opt-box-left">
-        <el-button
-          v-if="add?.enable"
-          type="primary"
-          icon="Plus"
-          @click="onAdd"
-          class="filter-item"
-          >添加</el-button
-        >
-        <el-button
-          v-if="edit?.enable"
-          type="success"
-          icon="Edit"
-          class="filter-item"
-          :disabled="selectedIds.length === 0"
-          @click="onEdit"
-          >修改</el-button
-        >
-        <el-button
-          v-if="del?.enable"
-          type="danger"
-          icon="Delete"
-          class="filter-item"
-          :disabled="selectedIds.length === 0"
-          @click="onDelete"
-          >删除</el-button
-        >
-        <el-button
-          class="filter-item"
-          v-if="ip && ip.enable"
-          type="default"
-          icon="Upload"
-          >导入</el-button
-        >
-        <el-button
-          v-if="op && op.enable"
-          type="default"
-          icon="Download"
-          class="filter-item"
-          >导出</el-button
-        >
-      </div>
-
-      <div class="opt-box-right">
-        <el-button icon="Refresh" size="small" circle @click="reload" />
-      </div>
-    </div>
-
     <el-table
       :data="records"
       :row-key="rowKey || 'id'"
@@ -73,9 +24,10 @@
       <el-pagination
         background
         layout="total, sizes, prev, pager, next"
+        :default-page-size="pageSize"
         :total="total"
         :current-page="current"
-        :page-sizes="[10, 50, 100, 500]"
+        :page-sizes="[10, 20, 50, 100]"
         @size-change="sizeChange"
         @current-change="currentChange"
       />
@@ -84,15 +36,15 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, toRefs, PropType, ref, unref } from 'vue'
+import { onMounted, toRefs, PropType, ref } from 'vue'
 import { OptionsType, TableQueryType } from './types'
-import { ElMessageBox, ElMessage } from 'element-plus'
 import request from '@/utils/request'
 
 // 页面参数
 const current = ref(1)
 const records = ref([])
 const total = ref(0)
+const pageSize = ref(10)
 const loading = ref(false)
 const selectedIds = ref([] as any[])
 const selectedRow = ref({} as any)
@@ -117,9 +69,7 @@ const props = defineProps({
 const emit = defineEmits(['onAdd', 'onEdit', 'onDelete', 'onBatch'])
 
 // 解构参数便于处理
-const { listUrl, delUrl, rowKey, add, edit, del, ip, op } = toRefs(
-  props.options
-)
+const { listUrl, rowKey } = toRefs(props.options)
 const { query } = toRefs(props)
 
 // 搜索数据
@@ -152,90 +102,6 @@ const selection = (rows: { id: string }[]) => {
 const rowSelect = (row: any) => {
   selectedRow.value = row
 }
-
-// 添加操作
-const onAdd = () => {
-  emit('onAdd', selectedRow.value)
-}
-
-// 修改操作
-const onEdit = () => {
-  console.log('修改操作：' + JSON.stringify(selectedRow.value))
-  emit('onEdit', unref(selectedRow.value[0]))
-}
-
-// 删除操作
-const onDelete = () => {
-  ElMessageBox.confirm('确实要删除选定的数据吗?', '提示信息', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(() => {
-    emit('onDelete', unref(selectedIds))
-    request
-      .request<string[]>({
-        url: delUrl?.value,
-        method: 'post',
-        data: { role_id: selectedIds.value[0] },
-      })
-      .then(() => {
-        ElMessage({
-          showClose: true,
-          message: '删除成功！',
-          type: 'success',
-        })
-        // 刷新数据
-        loadData()
-      })
-  })
-}
-
-// 批量操作
-// const onBatch = (data: BatchType) => {
-//   console.log('批量操作' + JSON.stringify(data))
-
-//   ElMessageBox.confirm('确认要批量操作吗?', '提示信息', {
-//     confirmButtonText: '确认',
-//     cancelButtonText: '取消',
-//     type: 'warning',
-//   }).then(() => {
-//     // 回调数据
-//     const result = {
-//       ids: selectedIds.value,
-//       key: data.key,
-//     }
-
-//     // 回调即可
-//     emit('onBatch', result)
-
-//     // 直接提交数据
-//     if (data.action) {
-//       let params = data.params || {}
-
-//       params[data.idsKey || 'ids'] = selectedIds.value
-
-//       // 执行批量操作
-//       // request
-//       //   .post({
-//       //     url: data.action,
-//       //     data: params
-//       //   })
-//       //   .then(() => {
-//       //     ElMessage({
-//       //       showClose: true,z
-//       //       message: '操作成功！',
-//       //       type: 'success'
-//       //     })
-//       //     // 刷新数据
-//       //     loadData()
-//       //   })
-
-//       console.log('提交到：' + data.action)
-//       console.log('提交参数：' + JSON.stringify(params))
-//     }
-//   })
-// }
-
 // 刷新数据
 const reload = () => {
   console.log('数据已重新加载..')
@@ -276,7 +142,6 @@ const sizeChange = (size: any) => {
 }
 
 const currentChange = (count: any) => {
-  // debugger
   current.value = count
   query.value.page = count
   loadData()

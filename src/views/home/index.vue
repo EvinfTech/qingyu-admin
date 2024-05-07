@@ -1,28 +1,3 @@
-<script setup lang="ts">
-import OrderChart from '@/views/chart/orderChart.vue'
-import AreaChart from '@/views/chart/areaChart.vue'
-import PieChart from '@/views/chart/pieChart.vue'
-
-const testData1 = [
-  {
-    text: '今日营收',
-    value: 3600,
-    oldValue: 1800,
-    dValue: 1800,
-    percentage: 50,
-  },
-  {
-    text: '今日订单',
-    value: 1000,
-    oldValue: 2000,
-    dValue: -1000,
-    percentage: -50,
-  },
-  { text: '今日场时', value: 60, oldValue: 30, dValue: 30, percentage: 100 },
-  { text: '场时均价', value: 60, oldValue: 30, dValue: 30, percentage: 100 },
-]
-</script>
-
 <template>
   <div class="business_main">
     <div class="business_grid">
@@ -31,34 +6,70 @@ const testData1 = [
           ><div class="grid_card">
             <div class="grid_head">
               <div>{{ item.text }}</div>
-              <div>￥ {{ item.value }}</div>
-            </div>
-            <el-divider border-style="dashed" style="margin: 0" />
-            <div>
-              <p class="grid_tips">昨日 ￥{{ item.oldValue }}</p>
+              <div>{{ item.value }}</div>
             </div>
           </div></el-col
         >
       </el-row>
     </div>
     <div class="business_chart">
-      <OrderChart></OrderChart>
+      <OrderChart :data="siteMoney"></OrderChart>
     </div>
 
     <div>
       <el-row :gutter="10">
         <el-col :sm="12" :xs="24">
           <div class="business_chart">
-            <AreaChart></AreaChart></div
+            <AreaChart :data="siteCount"></AreaChart></div
         ></el-col>
         <el-col :sm="12" :xs="0">
           <div class="business_chart">
-            <PieChart></PieChart></div
+            <PieChart :data="lineCount"></PieChart></div
         ></el-col>
       </el-row>
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { onBeforeMount, ref } from 'vue'
+import OrderChart from '@/views/home/chart/orderChart.vue'
+import AreaChart from '@/views/home/chart/areaChart.vue'
+import PieChart from '@/views/home/chart/pieChart.vue'
+import { getOperationalData } from '@/api/shop'
+
+const siteMoney = ref([])
+const siteCount = ref([])
+const lineCount = ref([] as any)
+
+onBeforeMount(() => {
+  getData()
+})
+
+const getData = async () => {
+  getOperationalData({}).then((res: any) => {
+    let data = res.data.data
+    testData1.value[0].value = '￥ ' + data.today_money
+    testData1.value[1].value = data.today_order_count
+    testData1.value[2].value = data.today_site_user_count
+    testData1.value[3].value = '￥ ' + data.today_site_average_price
+
+    siteMoney.value = data.week_site_money
+
+    siteCount.value = data.week_site_count
+
+    lineCount.value = []
+    lineCount.value.push(data.offline_count)
+    lineCount.value.push(data.on_line_count)
+  })
+}
+
+const testData1 = ref([
+  { text: '今日营收', value: '' },
+  { text: '今日订单', value: 0 },
+  { text: '今日场地数量', value: 0 },
+  { text: '今日场时均价', value: '' },
+])
+</script>
 
 <style scoped>
 .business_main {
@@ -112,3 +123,4 @@ const testData1 = [
   height: 400px;
 }
 </style>
+@/api/shop

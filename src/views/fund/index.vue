@@ -9,21 +9,13 @@
         />
         <div class="store_head_main hidden-xs-only">
           <p class="store_name">{{ store.name }}</p>
-          <p class="store_tips">已使用奇羽SaaS运营366天</p>
+          <p class="store_tips">已使用轻羽场馆管理平台运营{{ serverDay }}天</p>
           <div class="store_card">
-            <div>
-              <p class="card_text">总金额</p>
-              <p class="card_value">7,425.75</p>
+            <div v-for="item in data2">
+              <p class="card_text">{{ item.text }}</p>
+              <p class="card_value">{{ item.value }}</p>
             </div>
-            <div>
-              <p class="card_text">结算中</p>
-              <p class="card_value">7,425.75</p>
-            </div>
-            <div>
-              <p class="card_text">可提现</p>
-              <p class="card_value">7,425.75</p>
-            </div>
-            <el-button type="warning" @click="cash()">提现</el-button>
+            <el-button type="warning" @click="cash()">全部提现</el-button>
           </div>
         </div>
         <el-tag>运营中</el-tag>
@@ -38,59 +30,48 @@
             ><div class="grid_card">
               <div class="grid_head">
                 <div>{{ item.text }}</div>
-                <div>￥ {{ item.value }}</div>
+                <div>{{ item.value }}</div>
               </div>
               <el-divider border-style="dashed" />
-              <div><p class="grid_tips">昨日 ￥1200</p></div>
-            </div></el-col
-          >
+              <div><p class="grid_tips">昨日 --</p></div>
+            </div>
+          </el-col>
         </el-row>
       </div>
     </div>
     <div class="bill_box">
       <p class="fund_title">账单流水</p>
       <el-table :data="tableData" stripe style="width: 100%">
-        <el-table-column label="时间" width="180">
+        <el-table-column type="index" width="50" />
+
+        <el-table-column label="时间">
           <template #default="scope">
-            <span>{{ formattedDate(scope.row.datetime) }}</span>
+            <span>{{ scope.row.time }}</span>
           </template>
         </el-table-column>
 
         <el-table-column label="关联单号">
           <template #default="scope">
-            <span>{{ scope.row.order_id }}</span>
+            <span>{{ scope.row.transaction_serial_no }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="分类" width="100">
+        <el-table-column label="类型">
           <template #default="scope">
-            <span>{{ scope.row.group }}</span>
+            <el-tag v-if="scope.row.type == 'T'" type="warning">提现</el-tag>
+            <el-tag v-else>结算</el-tag>
           </template>
         </el-table-column>
 
-        <el-table-column label="类型" width="100">
+        <el-table-column label="流水金额">
           <template #default="scope">
-            <el-tag>{{ scope.row.type }}</el-tag>
+            <span>{{ formatMoney(scope.row.money) }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="流水金额" width="180">
+        <el-table-column label="余额">
           <template #default="scope">
-            <span>{{ scope.row.money }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="余额" width="180">
-          <template #default="scope">
-            <span>{{ scope.row.sum }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="操作">
-          <template #default="scope">
-            <el-button size="small" @click="handleEdit(scope.$index, scope.row)"
-              >详情</el-button
-            >
+            <span>{{ formatMoney(scope.row.balance) }}</span>
           </template>
         </el-table-column>
       </el-table>
@@ -98,12 +79,12 @@
         <el-pagination
           v-model:current-page="currentPage4"
           v-model:page-size="pageSize4"
-          :page-sizes="[20, 50, 100]"
+          :page-sizes="[10, 20, 50]"
           :small="small"
           :disabled="disabled"
           :background="background"
           layout="total, sizes, prev, pager, next"
-          :total="3"
+          :total="dataTotal"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
@@ -114,115 +95,119 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import 'element-plus/theme-chalk/display.css'
-import { ElNotification } from 'element-plus'
-import { getShopDetail } from '@/api/venue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  getShopDetail,
+  getShopCapital,
+  getBillList,
+  withdrawal,
+} from '@/api/shop'
 import { baseURL } from '@/config/request.ts'
+import { formatMoney } from '@/utils/money.js'
 
-const testData1 = [
-  { text: '总订单额', value: 999 },
-  { text: '总支付订单额', value: 999 },
-  { text: '总退款订单额', value: 999 },
-  { text: '总成交额', value: 999 },
-  { text: '今日订单额', value: 999 },
-  { text: '今日支付订单额', value: 999 },
-  { text: '今日退款订单额', value: 999 },
-  { text: '今日成交额', value: 999 },
-]
+const testData1 = ref([
+  { text: '总订单额', value: '' },
+  { text: '总支付订单额', value: '999' },
+  { text: '总退款订单额', value: '999' },
+  { text: '总成交额', value: '999' },
+  { text: '今日订单额', value: '999' },
+  { text: '今日支付订单额', value: '999' },
+  { text: '今日退款订单额', value: '999' },
+  { text: '今日成交额', value: '999' },
+])
 
-interface Turnover {
-  id: string
-  datetime: Date
-  order_id: string
-  group: string
-  type: string
-  money: number
-  sum: number // 余额
-}
+const data2 = ref([
+  { text: '净收入', value: '0' },
+  { text: '总订单额', value: '0' },
+  { text: '可提现', value: '0' },
+])
 
 const store = ref({ name: '', avatar: '' })
+const serverDay = ref(0)
+const withdrawalMoeny = ref(0)
 
-const tableData: Turnover[] = [
-  {
-    id: '20230202026515665',
-    datetime: new Date(2023, 11, 7, 0, 0, 0),
-    order_id: '20230202026515665',
-    group: '订单',
-    type: '交易',
-    money: 200,
-    sum: -600, // 余额
-  },
-  {
-    id: '2024020202651512312',
-    datetime: new Date(2023, 11, 7, 0, 0, 0),
-    order_id: '20230202026515665',
-    group: '订单',
-    type: '提现',
-    money: -1000,
-    sum: -800, // 余额
-  },
-  {
-    id: '20230202026515665',
-    datetime: new Date(2023, 11, 7, 0, 0, 0),
-    order_id: '20230202026515665',
-    group: '订单',
-    type: '交易',
-    money: 200,
-    sum: 200, // 余额
-  },
-]
+const tableData = ref([])
 
 onMounted(() => {
+  updateInfo()
+  updateTable()
+})
+
+const updateInfo = () => {
   getShopDetail({ shop_id: 1 }).then((res: any) => {
     store.value.name = res.data.data.name
     store.value.avatar = res.data.data.avatar
   })
-})
 
-const cash = () => {
-  ElNotification({
-    title: '提示',
-    message: '请绑定银行卡信息',
-    type: 'info',
+  getShopCapital({ shop_id: 1 }).then((res: any) => {
+    console.log(res.data.data)
+    let tmpData = res.data.data
+    testData1.value[0].value = formatMoney(tmpData.aggregate_order_money)
+    testData1.value[1].value = formatMoney(tmpData.aggregate_order_pay_money)
+    testData1.value[2].value = formatMoney(tmpData.aggregate_order_refund_money)
+    testData1.value[3].value = formatMoney(
+      tmpData.aggregate_volume_of_transaction
+    )
+    testData1.value[4].value = formatMoney(tmpData.today_order_money)
+    testData1.value[5].value = formatMoney(tmpData.today_order_pay_money)
+    testData1.value[6].value = formatMoney(tmpData.today_order_refund_money)
+    testData1.value[7].value = formatMoney(tmpData.today_volume_of_transaction)
+
+    data2.value[0].value = formatMoney(tmpData.aggregate_amount)
+    data2.value[1].value = formatMoney(tmpData.aggregate_order_money)
+    data2.value[2].value = formatMoney(tmpData.balance)
+
+    withdrawalMoeny.value = tmpData.balance
+    serverDay.value = tmpData.service_date
   })
 }
 
-// 查看详情
-const handleEdit = (index: number, row: Turnover) => {
-  // router.push('/order/order_detail')
-  console.log(index, row)
-  ElNotification({
-    title: '暂无数据',
-    message: '暂无数据',
-    type: 'info',
+const updateTable = () => {
+  getBillList({
+    shop_id: 1,
+    page: currentPage4.value,
+    size: pageSize4.value,
+  }).then((res: any) => {
+    tableData.value = []
+    tableData.value = res.data.data.list
+    dataTotal.value = res.data.data.total
+    console.log('aaa', res.data.data.list)
+  })
+}
+
+const cash = () => {
+  ElMessageBox.confirm('确认要全部提现吗?', '提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(() => {
+    withdrawal({ money: withdrawalMoeny.value }).then((res: any) => {
+      if (res.data.code == 200) {
+        ElMessage({
+          showClose: true,
+          message: '取消成功！',
+          type: 'success',
+        })
+        updateInfo()
+        updateTable()
+      }
+    })
   })
 }
 
 // 分页信息
 const currentPage4 = ref(1)
 const pageSize4 = ref(20)
+const dataTotal = ref(0)
 const small = ref(false)
 const background = ref(false)
 const disabled = ref(false)
 
-const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`)
+const handleSizeChange = () => {
+  updateTable()
 }
-const handleCurrentChange = (val: number) => {
-  console.log(`current page: ${val}`)
-}
-
-function formattedDate(date: Date) {
-  // 使用Date对象的toLocaleString方法进行格式化
-  // 你可以根据需要选择不同的语言和格式选项
-  return date.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-  })
+const handleCurrentChange = () => {
+  updateTable()
 }
 </script>
 
@@ -323,3 +308,4 @@ p {
   padding-top: 10px;
 }
 </style>
+@/api/shop

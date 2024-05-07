@@ -1,45 +1,3 @@
-<script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { appName } from '@/config/app'
-import { useUserStore } from '@/stores/user'
-import { User as UserType } from '@/stores/user'
-import { reactive, ref } from 'vue'
-import { saasLogin } from '@/api/common'
-import { ElMessage } from 'element-plus'
-
-enum PasswordType {
-  Password = 'password',
-  Text = 'text',
-}
-
-const router = useRouter()
-const userStore = useUserStore()
-
-const form = reactive({ name: '', password: '' })
-
-const passwordType = ref<PasswordType>(PasswordType.Password)
-
-const passwordTypeChange = () => {
-  passwordType.value =
-    passwordType.value === PasswordType.Password
-      ? PasswordType.Text
-      : PasswordType.Password
-}
-
-const login = () => {
-  let loginInfo = { name: form.name, password: form.password }
-  saasLogin(loginInfo)
-    .then(() => {
-      let user: UserType = { name: form.name, token: 'xxxxxxx' }
-      userStore.updateUserInfo(user)
-      router.push('/')
-    })
-    .catch(() => {
-      ElMessage('用户名或密码错误')
-    })
-}
-</script>
-
 <template>
   <div class="login">
     <div class="login-box">
@@ -118,7 +76,7 @@ const login = () => {
         <el-button
           size="large"
           type="primary"
-          @click="login()"
+          @click="userlogin()"
           style="width: 100%"
           >立即登录
         </el-button>
@@ -126,6 +84,48 @@ const login = () => {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+import { appName } from '@/config/app'
+import { useUserStore } from '@/stores/user'
+import { User as UserType } from '@/stores/user'
+import { reactive, ref } from 'vue'
+import { login } from '@/api/common'
+import { ElMessage } from 'element-plus'
+
+enum PasswordType {
+  Password = 'password',
+  Text = 'text',
+}
+
+const router = useRouter()
+const userStore = useUserStore()
+
+const form = reactive({ name: '', password: '' })
+
+const passwordType = ref<PasswordType>(PasswordType.Password)
+
+const passwordTypeChange = () => {
+  passwordType.value =
+    passwordType.value === PasswordType.Password
+      ? PasswordType.Text
+      : PasswordType.Password
+}
+
+const userlogin = () => {
+  let loginInfo = { name: form.name, password: form.password }
+  login(loginInfo)
+    .then(() => {
+      let user: UserType = { name: form.name, token: 'xxxxxxx' }
+      userStore.updateUserInfo(user)
+      router.push('/')
+    })
+    .catch(() => {
+      ElMessage('用户名或密码错误')
+    })
+}
+</script>
 
 <style scoped lang="scss">
 .login {

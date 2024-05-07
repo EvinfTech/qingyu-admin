@@ -127,6 +127,7 @@ watch(
 
 onMounted(() => {
   order.value = props.order
+  console.log(props.order)
   updateShowData()
 })
 
@@ -143,12 +144,14 @@ const updateShowData = () => {
     // { title: '订单状态', value: order.value.state, icon: '', span: 1 },
     { title: '下单时间', value: order.value.gmt_create, icon: '', span: 1 },
     { title: '截止时间', value: order.value.end_time, icon: '', span: 1 },
+    { title: '手机号', value: order.value.user_phone, icon: '', span: 1 },
     {
       title: '应付金额',
       value: (order.value.money / 100).toFixed(2),
       icon: '',
       span: 1,
     },
+    { title: '备注', value: order.value.remake, icon: '', span: 2 },
   ]
 
   tableData.value = []

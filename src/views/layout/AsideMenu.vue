@@ -1,33 +1,41 @@
 <script setup lang="ts">
-import {storeToRefs} from "pinia";
-import {useRoute} from 'vue-router'
-import {appName} from "@/config/app"
-import {useAppStore} from "@/stores/app";
-import {menus} from "@/router/menu.ts"
-import RouteMenu from "./components/RouteMenu.vue";
+import { storeToRefs } from 'pinia'
+import { useRoute } from 'vue-router'
+import { appName } from '@/config/app'
+import { useAppStore } from '@/stores/app'
+import { menus } from '@/router/menu.ts'
+import RouteMenu from './components/RouteMenu.vue'
 
 const route = useRoute()
 const appStore = useAppStore()
-const {asideCollapse} = storeToRefs(appStore)
+const { asideCollapse } = storeToRefs(appStore)
 </script>
 
 <template>
   <div class="aside">
     <div class="logo">
-      <img src="../../assets/logo.svg" alt="" v-if="asideCollapse">
+      <img src="../../assets/logo.svg" alt="" v-if="asideCollapse" />
       <span v-else>
-        <img style="width: 20px;margin-right: 6px;position: relative;top: 3px" src="../../assets/logo.svg"
-             alt="">{{ appName }}
+        <img
+          style="width: 20px; margin-right: 6px; position: relative; top: 3px"
+          src="../../assets/logo.svg"
+          alt=""
+        />{{ appName }}
       </span>
     </div>
     <el-menu
-        class="menu"
-        :collapse="asideCollapse"
-        router
-        :collapse-transition="true"
-        :default-active="route.path"
+      class="menu"
+      :collapse="asideCollapse"
+      router
+      :collapse-transition="true"
+      :default-active="route.path"
     >
-      <RouteMenu :path="menu.path" :menu="menu" v-for="menu in menus" :key="menu.path"/>
+      <RouteMenu
+        :path="menu.path"
+        :menu="menu"
+        v-for="menu in menus"
+        :key="menu.path"
+      />
     </el-menu>
   </div>
 </template>
@@ -56,5 +64,4 @@ const {asideCollapse} = storeToRefs(appStore)
     border-right: none;
   }
 }
-
 </style>

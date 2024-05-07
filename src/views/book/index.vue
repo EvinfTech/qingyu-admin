@@ -27,7 +27,7 @@
           ></el-radio-button>
         </el-radio-group>
         <el-table class="my_table" :data="tableData" style="width: 100%">
-          <el-table-column fixed prop="timeValue" label="时间" width="70">
+          <el-table-column fixed prop="timeValue" label="时间" width="110">
           </el-table-column>
           <el-table-column
             v-for="(column, index) in colNames"
@@ -104,7 +104,8 @@
 </template>
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
-import { addOrder, getSiteReserve } from '@/api/site'
+import { addOrder, wxPay } from '@/api/order'
+import { getSiteReserve } from '@/api/site'
 import { useEnumStore } from '@/stores/enum.ts'
 import { ElMessage } from 'element-plus'
 import { minScreenMaxWidth } from '@/config/app'
@@ -176,6 +177,7 @@ watch(
   () => {
     updateData(selectDate.value)
     seletSite.value = []
+    setShowSeletSite()
   }
 )
 
@@ -210,19 +212,19 @@ const setShowSeletSite = () => {
 const getTagType = (name: string) => {
   switch (name) {
     case '线下预定':
-      return 'success'
+      return 'primary'
     case '线上预定':
       return 'warning'
     case '不可预定':
       return 'info'
     default:
-      return 'success'
+      return 'primary'
   }
 }
 
 // 刷新数据
 const updateData = (date: any) => {
-  getSiteReserve({ shop_id: 1, date: date }).then((res: any) => {
+  getSiteReserve({ date: date }).then((res: any) => {
     let postData = res.data.data
     // 数据清空
     tableData.value = []
@@ -304,6 +306,12 @@ const submit = async (formEl: FormInstance | undefined) => {
             type: 'success',
             message: '提交成功',
           })
+
+          // 顺便模拟支付
+          let order = res.data.data.order
+          wxPay({ order_no: order })
+
+          formEl.resetFields()
           updateData(selectDate.value)
         } else {
           ElMessage({
@@ -341,7 +349,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
   .my_table {
     padding: 10px 0;
-    height: 80vh;
+    height: 77vh;
     --el-table-border-color: '#FFFFFF' !important;
   }
 }
