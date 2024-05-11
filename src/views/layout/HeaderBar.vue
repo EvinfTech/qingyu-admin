@@ -5,8 +5,11 @@ import { useUserStore } from '@/stores/user'
 import { useMediaQuery } from '@vueuse/core'
 import Breadcrumb from '@/views/layout/components/Breadcrumb.vue'
 import Fullscreen from '@/views/layout/components/Fullscreen.vue'
+import { useRouter } from 'vue-router'
 // import ThemeSwitch from '@/views/layout/components/themeSwitch/Index.vue'
 //===========
+
+const router = useRouter()
 const appStore = useAppStore()
 const { asideCollapse } = storeToRefs(appStore)
 //==========
@@ -17,6 +20,10 @@ const isMobile = useMediaQuery(`(max-width: 750px)`)
 
 const loginOut = () => {
   userStore.loginOut()
+}
+
+const toPath = () => {
+  router.push('/system/modifyPwd')
 }
 </script>
 
@@ -40,7 +47,7 @@ const loginOut = () => {
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>修改密码</el-dropdown-item>
+            <el-dropdown-item @click="toPath">修改密码</el-dropdown-item>
             <el-dropdown-item @click="loginOut">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </template>

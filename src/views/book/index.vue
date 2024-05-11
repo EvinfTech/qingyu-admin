@@ -71,8 +71,8 @@
           <el-form-item label="手机" prop="phone">
             <el-input v-model="form.phone" />
           </el-form-item>
-          <el-form-item label="备注" prop="remake">
-            <el-input v-model="form.remake" />
+          <el-form-item label="备注" prop="remark">
+            <el-input v-model="form.remark" />
           </el-form-item>
         </el-form>
         <h3>场次信息</h3>
@@ -134,13 +134,13 @@ const ruleFormRef = ref<FormInstance>()
 let form = reactive<RuleForm>({
   name: '',
   phone: '',
-  remake: '',
+  remark: '',
 })
 
 interface RuleForm {
   name: string
   phone: string
-  remake: string
+  remark: string
 }
 
 const rules = reactive<FormRules<RuleForm>>({
@@ -249,7 +249,14 @@ const updateData = (date: any) => {
         } else if (value.store_time_enum.includes(numberKey)) {
           value.price.forEach((v: any) => {
             // 可预定场地的信息
-            if (v.time_enum == numberKey) {
+            let nowHour = dayjs().hour()
+            if (
+              //排除今天已经超时的
+              selectDate.value == dayjs().format('YYYY-MM-DD') &&
+              v.time_enum <= nowHour
+            ) {
+              dataObj[value.site_name] = '不可预定'
+            } else if (v.time_enum == numberKey) {
               dataObj[value.site_name] = {
                 id: tmpId,
                 price: v.price,
@@ -280,11 +287,13 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid) => {
     if (valid) {
       var data = reactive<any>({
-        user_name: form.name,
-        user_phone: form.phone,
-        remake: form.remake,
+        user_name: 'admin1',
+        user_phone: '13854236663',
+        remark: form.remark,
         shop_id: 1,
         gmt_site_use: selectDate,
+        reserve_name: form.name,
+        reserve_phone: form.phone,
         site_detail: [],
       })
       console.log(seletSite.value)
@@ -312,6 +321,8 @@ const submit = async (formEl: FormInstance | undefined) => {
           wxPay({ order_no: order })
 
           formEl.resetFields()
+          seletSite.value = []
+          setShowSeletSite()
           updateData(selectDate.value)
         } else {
           ElMessage({

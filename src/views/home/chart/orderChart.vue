@@ -26,19 +26,21 @@ watch(
 )
 
 option = {
+  title: { text: '场地收入' },
   tooltip: {
     trigger: 'axis',
     axisPointer: {
-      type: 'shadow', // 'shadow' as default; can also be 'line' or 'shadow'
+      type: 'line', // 'shadow' as default; can also be 'line' or 'shadow'
     },
   },
   legend: {
-    top: '10',
+    top: '30',
   },
   grid: {
     left: '3%',
     right: '4%',
-    bottom: '3%',
+    bottom: '10%',
+    top: '30%',
     containLabel: true,
   },
   xAxis: {
@@ -86,7 +88,7 @@ const dealData = () => {
       type: 'bar',
       stack: 'total',
       label: {
-        show: true,
+        show: false,
       },
       emphasis: {
         focus: 'series',

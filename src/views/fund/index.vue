@@ -1,46 +1,25 @@
 <template>
   <div class="fund_main">
-    <div class="store_box">
-      <div class="store_head">
-        <el-avatar
-          shape="square"
-          :size="180"
-          :src="baseURL + '/' + store.avatar"
-        />
-        <div class="store_head_main hidden-xs-only">
-          <p class="store_name">{{ store.name }}</p>
-          <p class="store_tips">已使用轻羽场馆管理平台运营{{ serverDay }}天</p>
-          <div class="store_card">
-            <div v-for="item in data2">
-              <p class="card_text">{{ item.text }}</p>
-              <p class="card_value">{{ item.value }}</p>
+    <div class="grid_box">
+      <p class="fund_title">线上数据</p>
+      <el-row :gutter="20">
+        <el-col :span="6" v-for="(item, index) in testData1" :key="index"
+          ><div class="grid_card">
+            <div class="grid_head">
+              <div>{{ item.text }}</div>
+              <div>{{ item.value }}</div>
             </div>
-            <el-button type="warning" @click="cash()">全部提现</el-button>
+            <el-divider border-style="dashed" />
+            <div><p class="grid_tips">昨日 --</p></div>
           </div>
-        </div>
-        <el-tag>运营中</el-tag>
-      </div>
-    </div>
-
-    <div class="online_box">
-      <div class="grid_box">
-        <p class="fund_title">线上数据</p>
-        <el-row :gutter="20">
-          <el-col :span="6" v-for="(item, index) in testData1" :key="index"
-            ><div class="grid_card">
-              <div class="grid_head">
-                <div>{{ item.text }}</div>
-                <div>{{ item.value }}</div>
-              </div>
-              <el-divider border-style="dashed" />
-              <div><p class="grid_tips">昨日 --</p></div>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
+        </el-col>
+      </el-row>
     </div>
     <div class="bill_box">
-      <p class="fund_title">账单流水</p>
+      <p class="flex-box-space-between">
+        <span class="fund_title">账单流水</span>
+        <el-button type="warning" @click="cash()">全部提现</el-button>
+      </p>
       <el-table :data="tableData" stripe style="width: 100%">
         <el-table-column type="index" width="50" />
 
@@ -94,16 +73,9 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import 'element-plus/theme-chalk/display.css'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {
-  getShopDetail,
-  getShopCapital,
-  getBillList,
-  withdrawal,
-} from '@/api/shop'
-import { baseURL } from '@/config/request.ts'
-import { formatMoney } from '@/utils/money.js'
+import { getShopCapital, getBillList, withdrawal } from '@/api/shop'
+import { formatMoney } from '@/utils/money'
 
 const testData1 = ref([
   { text: '总订单额', value: '' },
@@ -122,8 +94,6 @@ const data2 = ref([
   { text: '可提现', value: '0' },
 ])
 
-const store = ref({ name: '', avatar: '' })
-const serverDay = ref(0)
 const withdrawalMoeny = ref(0)
 
 const tableData = ref([])
@@ -134,11 +104,6 @@ onMounted(() => {
 })
 
 const updateInfo = () => {
-  getShopDetail({ shop_id: 1 }).then((res: any) => {
-    store.value.name = res.data.data.name
-    store.value.avatar = res.data.data.avatar
-  })
-
   getShopCapital({ shop_id: 1 }).then((res: any) => {
     console.log(res.data.data)
     let tmpData = res.data.data
@@ -158,7 +123,6 @@ const updateInfo = () => {
     data2.value[2].value = formatMoney(tmpData.balance)
 
     withdrawalMoeny.value = tmpData.balance
-    serverDay.value = tmpData.service_date
   })
 }
 
@@ -228,84 +192,39 @@ p {
   }
 }
 
-.store_box {
-  border-radius: 12px;
-  background-color: #ebeef4;
-  margin-bottom: 20px;
-  padding: 8px 12px;
-  .store_head {
-    display: flex;
-    justify-content: space-between;
-    .store_head_main {
-      margin: 0 30px;
-      width: 70%;
-      .store_name {
-        font-size: 32px;
-        font-weight: bold;
-        line-height: 64px;
-      }
-      .store_tips {
-        font-size: 14px;
-        color: #86909c;
-        line-height: 30px;
-      }
-      .store_card {
-        display: flex;
-        justify-content: space-between;
-        text-align: center;
-
-        .card_text {
-          line-height: 30px;
-        }
-        .card_value {
-          line-height: 42px;
-          font-size: 28px;
-          font-weight: bold;
-          color: #165dff;
-        }
-      }
-    }
-  }
-}
-
-.online_box {
-  display: flex;
-  justify-content: space-between;
-
-  .grid_box {
-    border-radius: 12px;
-    background-color: #ebeef4;
-    font-size: 14px;
-
-    width: 100%;
-    padding: 8px 12px;
-    .grid_card {
-      /* width: 700px; */
-      border-radius: 6px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 8px 12px;
-      margin-bottom: 10px;
-      gap: 8px;
-      flex-grow: 1;
-      align-self: stretch;
-
-      background: #f7f8fa;
-      .grid_head {
-        display: flex;
-        justify-content: space-between;
-      }
-      .grid_tips {
-        font-size: 12px;
-        color: #86909c;
-      }
-    }
-  }
-}
-
 .el_page {
   padding-top: 10px;
+}
+
+.grid_box {
+  border-radius: 12px;
+  background-color: #f8f8ff;
+  font-size: 14px;
+
+  width: 100%;
+  padding: 8px 12px;
+  .grid_card {
+    /* width: 700px; */
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    gap: 8px;
+    flex-grow: 1;
+    align-self: stretch;
+
+    background: #fff;
+    .grid_head {
+      display: flex;
+      justify-content: space-between;
+    }
+    .grid_tips {
+      font-size: 12px;
+      color: #86909c;
+    }
+  }
 }
 </style>
 @/api/shop

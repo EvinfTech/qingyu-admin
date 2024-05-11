@@ -4,9 +4,6 @@
       <el-descriptions-item v-for="item in showData" :span="item.span">
         <template #label>
           <div class="cell-item">
-            <!-- <el-icon :style="iconStyle">
-              <user />
-            </el-icon> -->
             {{ item.title }}
           </div>
         </template>
@@ -22,12 +19,8 @@
             订单状态
           </div>
         </template>
-        <el-tag size="small">{{
-          order.status == 'N'
-            ? '待支付'
-            : order.status == 'Y'
-            ? '已支付'
-            : '已取消'
+        <el-tag size="small" :type="statusEnum[order.status]?.type">{{
+          statusEnum[order.status]?.text
         }}</el-tag>
       </el-descriptions-item>
 
@@ -40,12 +33,17 @@
             操作
           </div>
         </template>
-        <el-button type="warning" @click="cancel">取消订单</el-button>
+        <el-button type="info" size="small" @click="showRemark()"
+          >修改备注</el-button
+        >
+        <el-button type="warning" size="small" @click="cancel"
+          >取消订单</el-button
+        >
       </el-descriptions-item>
     </el-descriptions>
 
     <div class="detail_detail">
-      <p>商品明细</p>
+      <p>场地预约明细</p>
 
       <div>
         <el-table :data="tableData" style="width: 100%">
@@ -77,13 +75,22 @@
       </p>
     </div>
   </div>
+
+  <el-dialog v-model="dlgVisible" title="修改备注">
+    <div class="flex-box-space-between">
+      <span style="width: 50px">备注</span>
+      <el-input v-model="remark" />
+      <el-button type="primary" @click="updateRemarkFun()">修改</el-button>
+    </div>
+  </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import type { ComponentSize } from 'element-plus'
-import { useEnumStore } from '@/stores/enum.ts'
-import { cancelOrder } from '@/api/order'
+import { useEnumStore, statusEnum } from '@/stores/enum.ts'
+import { cancelOrder, updateRemark } from '@/api/order'
 import { ElMessageBox, ElMessage } from 'element-plus'
+
 const props = defineProps({
   order: {
     type: Object as any,
@@ -103,6 +110,9 @@ const iconStyle = computed(() => {
     marginRight: marginMap[size.value] || marginMap.default,
   }
 })
+
+const dlgVisible = ref(false)
+const remark = ref('')
 
 let order = ref({} as any)
 const showData = ref({} as any)
@@ -127,36 +137,43 @@ watch(
 
 onMounted(() => {
   order.value = props.order
-  console.log(props.order)
   updateShowData()
 })
 
 const updateShowData = () => {
+  remark.value = order.value.remark
   showData.value = [
     { title: '订单号', value: order.value.order_no, icon: '', span: 2 },
     { title: '预定人', value: order.value.user_name, icon: '', span: 1 },
+    { title: '手机号', value: order.value.user_phone, icon: '', span: 1 },
+    { title: '使用人', value: order.value.reserve_name, icon: '', span: 1 },
+    { title: '手机号', value: order.value.reserve_phone, icon: '', span: 1 },
     {
       title: '订单来源',
       value: order.value.type == 1 ? '线上' : '线下',
       icon: '',
       span: 1,
     },
-    // { title: '订单状态', value: order.value.state, icon: '', span: 1 },
+    {
+      title: '预定使用时间',
+      value: order.value.gmt_site_use,
+      icon: '',
+      span: 1,
+    },
     { title: '下单时间', value: order.value.gmt_create, icon: '', span: 1 },
     { title: '截止时间', value: order.value.end_time, icon: '', span: 1 },
-    { title: '手机号', value: order.value.user_phone, icon: '', span: 1 },
     {
       title: '应付金额',
       value: (order.value.money / 100).toFixed(2),
       icon: '',
-      span: 1,
+      span: 2,
     },
-    { title: '备注', value: order.value.remake, icon: '', span: 2 },
+    { title: '备注', value: remark.value, icon: '', span: 2 },
   ]
 
   tableData.value = []
-  for (let i = 0; i < order.value.SiteDetail.length; i++) {
-    let tmp = order.value.SiteDetail[i]
+  for (let i = 0; i < order.value.site_detail.length; i++) {
+    let tmp = order.value.site_detail[i]
     tableData.value.push({
       id: tmp.site_id,
       name: tmp.site_name,
@@ -164,6 +181,26 @@ const updateShowData = () => {
       price: tmp.money,
     })
   }
+}
+
+const showRemark = () => {
+  dlgVisible.value = true
+}
+const updateRemarkFun = () => {
+  updateRemark({
+    order_no: order.value.order_no,
+    remark: remark.value,
+  }).then((res: any) => {
+    if (res.data.code == 200) {
+      ElMessage({
+        showClose: true,
+        message: '修改成功！',
+        type: 'success',
+      })
+      dlgVisible.value = false
+      emit('onUpdate')
+    }
+  })
 }
 
 const cancel = () => {
@@ -180,6 +217,12 @@ const cancel = () => {
           type: 'success',
         })
         emit('onUpdate')
+      } else {
+        ElMessage({
+          showClose: true,
+          message: res.data.msg,
+          type: 'error',
+        })
       }
     })
   })

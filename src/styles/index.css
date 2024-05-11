@@ -2,6 +2,7 @@
 .el-popup-parent--hidden {
   width: 100% !important;
 }
+
 .search-box {
   height: 50px;
   display: flex;
@@ -9,6 +10,7 @@
   background: #eee;
   padding: 0px 10px 0px 10px;
 }
+
 .opt-box {
   height: 50px;
   display: flex;
@@ -17,6 +19,7 @@
   padding: 0px 10px 0px 10px;
   margin-top: 20px;
 }
+
 .opt-box-left {
   height: 50px;
   display: flex;
@@ -24,6 +27,7 @@
   background: #f5f5f5;
   flex-grow: 1;
 }
+
 .opt-box-right {
   height: 50px;
   display: flex;
@@ -32,17 +36,36 @@
   width: 100px;
   justify-content: flex-end;
 }
+
 .search-items {
   display: flex;
   align-items: center;
 }
+
 .search-items > .filter-item {
   margin-right: 10px !important;
   width: 200px;
 }
+
 .paging-box {
   margin-top: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.flex-box {
+  display: flex;
+  align-items: center;  
+}
+
+.flex-box-space-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bottom-gap{
+  margin-bottom: 20px;
+
 }

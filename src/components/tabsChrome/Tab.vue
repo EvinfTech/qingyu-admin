@@ -1,27 +1,30 @@
 <script setup lang="ts">
-import {Tab} from "./tab.d"
+import { Tab } from './tab.d'
 
 const props = defineProps<{
-  active?: boolean,
-  tab: Tab,
+  active?: boolean
+  tab: Tab
 }>()
 
 const emit = defineEmits<{
-  (e: 'closeTab', t: Tab): void,
+  (e: 'closeTab', t: Tab): void
 }>()
 
 const closeTab = () => {
-  emit("closeTab", props.tab)
+  emit('closeTab', props.tab)
 }
-
 </script>
 
 <template>
-  <div class="tab" :class="{active}">
+  <div class="tab" :class="{ active }">
     <div class="title">
       {{ tab.title }}
     </div>
-    <div @click.stop="closeTab" class="close-icon" v-if="active && tab.closable">
+    <div
+      @click.stop="closeTab"
+      class="close-icon"
+      v-if="active && tab.closable"
+    >
       <svg width="16" height="16" stroke="#595959">
         <path d="M 4 4 L 12 12 M 12 4 L 4 12"></path>
       </svg>
@@ -64,7 +67,8 @@ const closeTab = () => {
       &.active {
         background-color: #121212;
 
-        .tabs-before-l, .tabs-before-r {
+        .tabs-before-l,
+        .tabs-before-r {
           fill: #121212;
         }
       }
@@ -73,7 +77,8 @@ const closeTab = () => {
   &.active {
     background-color: #fff;
 
-    .tabs-before-l, .tabs-before-r {
+    .tabs-before-l,
+    .tabs-before-r {
       fill: #fff;
     }
   }
@@ -88,7 +93,8 @@ const closeTab = () => {
     }
   }
 
-  .tabs-before-l, .tabs-before-r {
+  .tabs-before-l,
+  .tabs-before-r {
     bottom: 0px;
     position: absolute;
     fill: transparent;

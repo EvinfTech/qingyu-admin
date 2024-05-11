@@ -1,6 +1,6 @@
 <template>
   <div v-loading="loading" element-loading-text="加载中...">
-    <div class="search-box">
+    <div class="search-box" v-if="props.showSearch">
       <div class="search-items">
         <slot name="search"></slot>
       </div>
@@ -63,10 +63,14 @@ const props = defineProps({
       params: {},
     }),
   },
+  showSearch: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 // 事件定义
-const emit = defineEmits(['onAdd', 'onEdit', 'onDelete', 'onBatch'])
+// const emit = defineEmits(['onAdd', 'onEdit', 'onDelete', 'onBatch'])
 
 // 解构参数便于处理
 const { listUrl, rowKey } = toRefs(props.options)
@@ -74,15 +78,12 @@ const { query } = toRefs(props)
 
 // 搜索数据
 const search = () => {
-  // 第一页
   query.value.page = 1
-  // 加载数据
   loadData()
 }
 
 // 搜索数据
 const reset = () => {
-  // 清空值并搜索
   query.value.params = { shop_id: 1 }
   search()
 }

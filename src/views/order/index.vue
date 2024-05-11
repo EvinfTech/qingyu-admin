@@ -12,7 +12,6 @@
 
       <template #columns>
         <el-table-column type="index" width="50" />
-        <!-- <el-table-column type="selection" width="50px" /> -->
         <el-table-column prop="order_no" label="订单号" width="260px" />
         <el-table-column prop="user_name" label="用户名" />
         <el-table-column prop="type" label="类型">
@@ -28,12 +27,14 @@
 
         <el-table-column prop="status" label="状态">
           <template #default="scope">
-            {{ statusEnum[scope.row.status].text }}
+            <el-tag size="small" :type="statusEnum[scope.row.status]?.type">{{
+              statusEnum[scope.row.status]?.text
+            }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="gmt_create" label="创建日期" />
         <el-table-column prop="user_phone" label="下单手机号" />
-        <el-table-column prop="remake" label="备注" />
+        <el-table-column prop="remark" label="备注" />
         <el-table-column label="操作" width="180px">
           <template #default="scope">
             <el-button
@@ -81,7 +82,7 @@ import type {
   TableQueryType,
 } from '@/components/DataTable/src/types'
 
-import { checkOrder, wxPay } from '@/api/order'
+import { checkOrder, wxPay, getOrderListAPI } from '@/api/order'
 import { ElMessage } from 'element-plus'
 import { statusEnum } from '@/stores/enum'
 
@@ -103,7 +104,7 @@ let query = ref<TableQueryType>({
 let orderInfo = ref({} as any)
 // 表格默认参数
 let options = ref<OptionsType>({
-  listUrl: '/saas/get/order/list',
+  listUrl: getOrderListAPI,
   add: { enable: false },
   edit: { enable: false },
   del: { enable: false },
@@ -164,7 +165,7 @@ const check = () => {
     (res: any) => {
       if (res.data.msg == '核验成功') {
         ElMessage({
-          message: 'Congrats, this is a success message.',
+          message: '校验成功',
           type: 'success',
         })
         tableRef.value.reload()

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {Search,RefreshRight} from '@element-plus/icons-vue'
+import { Search, RefreshRight } from '@element-plus/icons-vue'
 
 const emit = defineEmits<{
-  (e: 'refresh'): void,
-  (e: 'reset'): void,
+  (e: 'refresh'): void
+  (e: 'reset'): void
 }>()
 </script>
 
@@ -16,10 +16,14 @@ const emit = defineEmits<{
         </div>
         <div class="r">
           <slot name="right"></slot>
-          <el-button style="margin-left: 10px" type="success" @click="emit('refresh')">
+          <el-button
+            style="margin-left: 10px"
+            type="success"
+            @click="emit('refresh')"
+          >
             查询
             <el-icon class="el-icon--right">
-              <Search  />
+              <Search />
             </el-icon>
           </el-button>
           <el-button type="warning" @click="emit('reset')">
@@ -35,21 +39,20 @@ const emit = defineEmits<{
 </template>
 
 <style scoped lang="scss">
-.action-card{
-
+.action-card {
   .action-card-header {
     display: flex;
     justify-content: space-between;
-    .r,.l{
+    .r,
+    .l {
       display: flex;
     }
   }
-  :deep(.el-card__header){
+  :deep(.el-card__header) {
     padding: 10px;
   }
-
 }
-.el-card{
-  border: none!important;
+.el-card {
+  border: none !important;
 }
 </style>

@@ -2,6 +2,17 @@ import r from '@/utils/request.ts'
 
 // 订单相关API
 
+export const getOrderListAPI = '/saas/get/order/list'
+
+// 获取订单列表
+export function getOrderList(data: any) {
+  return r.request<string[]>({
+    url: 'saas/get/order/list',
+    method: 'post',
+    data,
+  })
+}
+
 // 取消订单
 // order_no: ''
 export function cancelOrder(data: any) {
@@ -37,11 +48,11 @@ export function checkOrder(data: any) {
 // ], //场地详情
 // "reserve_name": "预约人姓名",
 // "reserve_phone": "19999999999",
-// "remake": "这个人打球很垃圾" //备注
+// "remark": "这个人打球很垃圾" //备注
 export function addOrder(data: any) {
   return r.request<string[]>({
     //r.request会做拦截，因此响应的数据就是string[] 类型
-    url: 'saas/add/order',
+    url: '/saas/add/order',
     method: 'post',
     data,
   })
@@ -51,7 +62,15 @@ export function addOrder(data: any) {
 // order_no: ''
 export function wxPay(data: any) {
   return r.request<string[]>({
-    url: 'wx/pay',
+    url: '/wx/pay',
+    method: 'post',
+    data,
+  })
+}
+
+export function updateRemark(data: any) {
+  return r.request<string[]>({
+    url: '/saas/update/remark',
     method: 'post',
     data,
   })

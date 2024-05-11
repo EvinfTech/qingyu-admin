@@ -1,39 +1,40 @@
 <script setup lang="ts">
-import VTab from "./Tab.vue"
-import {Tab} from "@/components/tabsChrome/tab";
+import VTab from './Tab.vue'
+import { Tab } from '@/components/tabsChrome/tab'
 
 const props = defineProps<{
-  tabs: Tab[],
+  tabs: Tab[]
   activePath: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'clickTab', t: Tab): void,
-  (e: 'removeTab', t: Tab): void,
+  (e: 'clickTab', t: Tab): void
+  (e: 'removeTab', t: Tab): void
 }>()
 
 const clickTab = (t: Tab) => {
   if (t.path == props.activePath) {
     return
   }
-  emit("clickTab", t)
+  emit('clickTab', t)
 }
 const removeTab = (t: Tab) => {
-  if (props.tabs.length == 1) {//最少保留一个
+  if (props.tabs.length == 1) {
+    //最少保留一个
     return
   }
-  emit("removeTab", t)
+  emit('removeTab', t)
 }
-
 </script>
 
 <template>
   <div class="tabs">
-    <VTab v-for="t in tabs"
-          :tab="t"
-          :active="activePath === t.path"
-          @click="clickTab(t)"
-          @closeTab="removeTab"
+    <VTab
+      v-for="t in tabs"
+      :tab="t"
+      :active="activePath === t.path"
+      @click="clickTab(t)"
+      @closeTab="removeTab"
     />
   </div>
 </template>
@@ -43,9 +44,5 @@ const removeTab = (t: Tab) => {
   padding: 8px 10px 0 10px;
   display: flex;
   width: 100%;
-
-  .item {
-
-  }
 }
 </style>

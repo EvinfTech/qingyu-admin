@@ -7,6 +7,8 @@ const UIK = storagePrefixKey + 'User'
 export type User = {
   name: string
   token: string
+  avater: string
+  user_ouid: string
 } //自己完善
 
 export interface UserStore {
@@ -23,6 +25,8 @@ export const useUserStore = defineStore('user', {
   getters: {
     token: (state) => state.info.token,
     userName: (state) => state.info.name,
+    avater: (state) => state.info.avater,
+    userOuid: (state) => state.info.user_ouid,
   },
   actions: {
     updateUserInfo(user: User) {
@@ -47,6 +51,7 @@ export const getUserInfoByKey = (k: keyof User): any => {
 }
 
 export const getToken = (): string => {
-  let u = getUserInfo()
-  return u['token']
+  // let u = getUserInfo()
+  return ''
+  // return u['token']
 }

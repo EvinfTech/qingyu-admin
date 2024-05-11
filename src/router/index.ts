@@ -20,12 +20,12 @@ const menuRoute: RouteRecordRaw[] = [
     path: '',
     component: () => import('@/views/layout/MainLayout.vue'),
     redirect: '/',
-    meta: { icon: 'TrendCharts', title: '首页', alwaysShow: true },
+    meta: { icon: 'HomeFilled', title: '首页', alwaysShow: true },
     children: [
       {
         path: '',
         component: () => import('@/views/home/index.vue'),
-        meta: { icon: 'ElementPlus', title: '首页', hideMenu: true },
+        meta: { icon: 'HomeFilled', title: '首页', hideMenu: true },
       },
     ],
   },
@@ -55,9 +55,38 @@ const menuRoute: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/fund',
+    component: () => import('@/views/layout/MainLayout.vue'),
+    meta: { icon: 'Money', title: '资金流水', alwaysShow: true },
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/fund/index.vue'),
+        meta: { icon: 'Grid', title: '资金流水', hideMenu: true },
+      },
+    ],
+  },
+  {
+    path: '/user',
+    component: () => import('@/views/layout/MainLayout.vue'),
+    meta: { icon: 'User', title: '用户管理', alwaysShow: true },
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/user/index.vue'),
+        meta: { icon: 'Avatar', title: '用户管理' },
+      },
+      {
+        path: 'feedback',
+        component: () => import('@/views/user/feedback.vue'),
+        meta: { icon: 'ChatDotRound', title: '意见反馈' },
+      },
+    ],
+  },
+  {
     path: '/shop',
     component: () => import('@/views/layout/MainLayout.vue'),
-    meta: { icon: 'ElementPlus', title: '场馆管理' },
+    meta: { icon: 'Shop', title: '场馆管理' },
     children: [
       {
         path: 'base',
@@ -72,38 +101,24 @@ const menuRoute: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/user',
-    component: () => import('@/views/layout/MainLayout.vue'),
-    meta: { icon: 'Money', title: '用户管理', alwaysShow: true },
-    children: [
-      {
-        path: '',
-        component: () => import('@/views/user/index.vue'),
-        meta: { icon: 'Grid', title: '用户管理', hideMenu: true },
-      },
-    ],
-  },
-  {
-    path: '/fund',
-    component: () => import('@/views/layout/MainLayout.vue'),
-    meta: { icon: 'Money', title: '资金流水', alwaysShow: true },
-    children: [
-      {
-        path: '',
-        component: () => import('@/views/fund/index.vue'),
-        meta: { icon: 'Grid', title: '资金流水', hideMenu: true },
-      },
-    ],
-  },
-  {
     path: '/system',
     component: () => import('@/views/layout/MainLayout.vue'),
-    meta: { icon: 'ElementPlus', title: '系统设置', alwaysShow: true },
+    meta: { icon: 'Setting', title: '系统设置' },
     children: [
       {
         path: '',
         component: () => import('@/views/system/index.vue'),
-        meta: { title: '系统设置', hideMenu: true },
+        meta: { icon: 'Document', title: '协议设置' },
+      },
+      {
+        path: 'modifyPwd',
+        component: () => import('@/views/system/admin.vue'),
+        meta: { icon: 'Setting', title: '密码设置' },
+      },
+      {
+        path: 'key',
+        component: () => import('@/views/system/key.vue'),
+        meta: { icon: 'Key', title: '密钥管理' },
       },
     ],
   },

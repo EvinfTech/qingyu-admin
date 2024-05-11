@@ -17,7 +17,7 @@
       </template>
 
       <template #columns>
-        <el-table-column type="selection" width="50px" />
+        <el-table-column type="index" width="50px" />
         <el-table-column prop="avatar" label="头像">
           <template #default="scope">
             <el-avatar :size="30" :src="getUrl(scope.row.avatar)" />
@@ -84,7 +84,7 @@ import type {
 } from '@/components/DataTable/src/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
-import { updateUserInfo } from '@/api/user'
+import { updateUserInfo, getUserListAPI } from '@/api/user'
 import { baseURL } from '@/config/request.ts'
 import dayjs from 'dayjs'
 
@@ -103,8 +103,7 @@ const getUrl = (url: string) => {
 
 // 表格默认参数
 let options = ref<OptionsType>({
-  listUrl: '/saas/get/user/list',
-  delUrl: '/saas/del/role',
+  listUrl: getUserListAPI,
   add: { enable: false },
   edit: { enable: false },
   del: { enable: false },
@@ -199,4 +198,3 @@ const handleSave = (formEl: FormInstance | undefined) => {
   })
 }
 </script>
-@/api/user

@@ -74,7 +74,7 @@ const removeAllTab = () => {
 .nav-tab {
   display: flex;
   align-items: center;
-  background-color: #ebeef4;
+  background-color: #f8f8ff;
   .tabs-chrome {
     flex: 1;
     overflow-x: auto;

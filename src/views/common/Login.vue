@@ -25,6 +25,7 @@
           placeholder="密码"
           name="password"
           maxlength="50"
+          @keyup.enter="userlogin"
         >
           <template #prepend>
             <el-icon>
@@ -116,8 +117,14 @@ const passwordTypeChange = () => {
 const userlogin = () => {
   let loginInfo = { name: form.name, password: form.password }
   login(loginInfo)
-    .then(() => {
-      let user: UserType = { name: form.name, token: 'xxxxxxx' }
+    .then((res: any) => {
+      let tmp = res.data.data
+      let user: UserType = {
+        name: form.name,
+        token: 'xxxxxxxxxxx',
+        user_ouid: tmp.user_ouid,
+        avater: tmp.avater,
+      }
       userStore.updateUserInfo(user)
       router.push('/')
     })
