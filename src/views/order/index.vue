@@ -32,7 +32,7 @@
             }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="gmt_create" label="创建日期" />
+        <el-table-column prop="gmt_create" label="创建日期" width="160px" />
         <el-table-column prop="user_phone" label="下单手机号" />
         <el-table-column prop="remark" label="备注" />
         <el-table-column label="操作" width="180px">

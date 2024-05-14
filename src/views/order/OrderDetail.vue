@@ -43,7 +43,10 @@
     </el-descriptions>
 
     <div class="detail_detail">
-      <p>场地预约明细</p>
+      <p class="flex-box-space-between">
+        <span>场地预约明细</span>
+        <el-tag type="primary">预定使用日期：{{ order.gmt_site_use }}</el-tag>
+      </p>
 
       <div>
         <el-table :data="tableData" style="width: 100%">
@@ -154,12 +157,12 @@ const updateShowData = () => {
       icon: '',
       span: 1,
     },
-    {
-      title: '预定使用时间',
-      value: order.value.gmt_site_use,
-      icon: '',
-      span: 1,
-    },
+    // {
+    //   title: '预定使用时间',
+    //   value: order.value.gmt_site_use,
+    //   icon: '',
+    //   span: 1,
+    // },
     { title: '下单时间', value: order.value.gmt_create, icon: '', span: 1 },
     { title: '截止时间', value: order.value.end_time, icon: '', span: 1 },
     {

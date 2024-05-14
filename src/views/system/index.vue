@@ -20,7 +20,7 @@
         <el-input
           v-model="form.about_us"
           style="width: 1000px"
-          :rows="18"
+          :rows="13"
           type="textarea"
           placeholder="请输入关于我们信息"
         />
@@ -29,7 +29,7 @@
       <el-button
         @click="submit"
         type="primary"
-        style="width: 100%; max-width: 1000px; height: 40%; margin-top: 20px"
+        style="width: 100%; max-width: 1000px"
         >更新</el-button
       >
     </el-form>

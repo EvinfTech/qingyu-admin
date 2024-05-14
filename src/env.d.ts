@@ -7,13 +7,8 @@ declare module '*.vue' {
   export default component
 }
 
+declare module 'nprogress'
 
+declare module 'fastCrudTable'
 
-
-declare module "nprogress"
-
-declare module "fastCrudTable"
-
-declare module "jsoneditor"
-
-
+declare module 'jsoneditor'

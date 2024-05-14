@@ -1,6 +1,6 @@
 <template>
   <el-row>
-    <el-col :lg="18" :md="24">
+    <el-col :xs="24" :sm="18">
       <div class="legend">
         <el-tag
           v-for="item in legends"
@@ -46,6 +46,7 @@
                   @change="onTagChange(scope.row[column])"
                   >{{ formatPrice(scope.row[column].price) }}</el-check-tag
                 >
+
                 <el-tag
                   v-else
                   :type="getTagType(scope.row[column])"
@@ -55,13 +56,33 @@
                 >
                   {{ scope.row[column] }}
                 </el-tag>
+
+                <!-- <el-popover
+                  v-else
+                  placement="top-start"
+                  title="预定信息"
+                  :width="100"
+                  trigger="hover"
+                  content="暂无"
+                >
+                  <template #reference>
+                    <el-tag
+                      :type="getTagType(scope.row[column])"
+                      effect="dark"
+                      size="large"
+                      style="width: 90px; height: 48px"
+                    >
+                      {{ scope.row[column] }}
+                    </el-tag>
+                  </template>
+                </el-popover> -->
               </div>
             </template>
           </el-table-column>
         </el-table>
       </div>
     </el-col>
-    <el-col :lg="6">
+    <el-col :xs="24" :sm="6">
       <div class="book_info">
         <h3>预约信息</h3>
         <el-form ref="ruleFormRef" :model="form" :rules="rules">
@@ -76,8 +97,8 @@
           </el-form-item>
         </el-form>
         <h3>场次信息</h3>
-        <div v-for="item in showSeletSite">
-          <div class="right-middle-show">
+        <div class="book_site_list">
+          <div class="right-middle-show" v-for="item in showSeletSite">
             <div>线下预约:{{ item.site }}</div>
             <div class="flex_box" v-for="data in item.data">
               <div>{{ data.time_value }}</div>
@@ -88,16 +109,18 @@
             <div>{{ selectDate }} 共{{ item.data.length }}场</div>
           </div>
         </div>
-        <div class="flex_box">
-          <h3>合计</h3>
-          <h3 style="color: #f44336">{{ formatPrice(showTotal) }}</h3>
+        <div>
+          <div class="flex_box">
+            <h3>合计</h3>
+            <h3 style="color: #f44336">{{ formatPrice(showTotal) }}</h3>
+          </div>
+          <el-button
+            @click="submit(ruleFormRef)"
+            type="primary"
+            style="width: 100%"
+            >结算</el-button
+          >
         </div>
-        <el-button
-          @click="submit(ruleFormRef)"
-          type="primary"
-          style="width: 100%; height: 40%"
-          >结算</el-button
-        >
       </div>
     </el-col>
   </el-row>
@@ -242,6 +265,7 @@ const updateData = (date: any) => {
       let tmpId = 0
 
       postData.forEach((value: any) => {
+        // todo 添加订单信息
         if (value.saas_reserve_time_enum.includes(numberKey)) {
           dataObj[value.site_name] = '线下预定'
         } else if (value.online_reserve_time_enum.includes(numberKey)) {
@@ -288,7 +312,7 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (valid) {
       var data = reactive<any>({
         user_name: 'admin1',
-        user_phone: '13854236663',
+        user_phone: '138****6663',
         remark: form.remark,
         shop_id: 1,
         gmt_site_use: selectDate,
@@ -340,7 +364,6 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 <style lang="scss">
 .legend {
-  width: 100%;
   display: flex;
   margin: 20px 10px;
   grid-gap: 0.5rem;
@@ -355,24 +378,31 @@ const submit = async (formEl: FormInstance | undefined) => {
 }
 
 .left-main {
-  margin: 10px;
-  width: 100%;
+  margin: 0 10px;
 
   .my_table {
     padding: 10px 0;
-    height: 77vh;
+    height: 75vh;
     --el-table-border-color: '#FFFFFF' !important;
   }
 }
 
 .book_info {
-  padding: 0 20px;
-  .right-middle-show {
-    padding: 10px 20px;
-    border-radius: 10px;
-    background-color: #eff3ff;
-    line-height: 2rem;
-    margin-bottom: 10px;
+  background-color: #f6f6f6;
+  padding: 10px 20px;
+  height: 87vh;
+  flex-direction: column; /* 垂直方向排列子元素 */
+  .book_site_list {
+    height: 46vh;
+    // height: 60%;
+    overflow-y: auto;
+    .right-middle-show {
+      padding: 10px 20px;
+      border-radius: 10px;
+      background-color: #eff3ff;
+      line-height: 2rem;
+      margin-bottom: 10px;
+    }
   }
 }
 

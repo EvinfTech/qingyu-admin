@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAppStore } from '@/stores/app'
 import { useMediaQuery } from '@vueuse/core'
@@ -8,25 +7,9 @@ import AsideMenu from '@/views/layout/AsideMenu.vue'
 import HeaderBar from '@/views/layout/HeaderBar.vue'
 import TabsChrome from '@/views/layout/TabsChrome.vue'
 
-import { getEnum } from '@/api/common'
-import { useEnumStore } from '@/stores/enum.ts'
-
 const isMinScreen = useMediaQuery(`(max-width: ${minScreenMaxWidth}px)`)
 const appStore = useAppStore()
 const { asideCollapse } = storeToRefs(appStore)
-
-const commonEnum = useEnumStore()
-
-onMounted(() => {
-  getEnum().then((res: any) => {
-    Object.keys(res.data.data.time_enum).forEach((key) => {
-      if (Number(key) > 25) {
-        delete res.data.data.time_enum[key]
-      }
-    })
-    commonEnum.updateUserInfo(res.data.data)
-  })
-})
 </script>
 
 <template>

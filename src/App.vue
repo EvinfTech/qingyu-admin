@@ -1,4 +1,20 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+
+import { getEnum } from '@/api/common'
+import { useEnumStore } from '@/stores/enum.ts'
+const commonEnum = useEnumStore()
+
+onMounted(() => {
+  getEnum().then((res: any) => {
+    Object.keys(res.data.data.time_enum).forEach((key) => {
+      if (Number(key) > 25) {
+        delete res.data.data.time_enum[key]
+      }
+    })
+    commonEnum.updateUserInfo(res.data.data)
+  })
+})
 </script>
 
 <template>
@@ -6,10 +22,10 @@
 </template>
 
 <style>
-*{
+* {
   box-sizing: border-box;
 }
-body{
+body {
   padding: 0;
   margin: 0;
 }

@@ -66,7 +66,7 @@
 </template>
 <script setup lang="ts">
 import { reactive, onMounted } from 'vue'
-import { updateMessageSetting, updateWXSetting } from '@/api/sys'
+import { updateMessageSetting, updateWXSetting, getSecret } from '@/api/sys'
 import { ElMessage } from 'element-plus'
 
 const msgForm = reactive({
@@ -80,7 +80,21 @@ const wxForm = reactive({
   wx_secret: '',
 })
 
-onMounted(() => {})
+onMounted(() => {
+  showInfo()
+})
+
+const showInfo = async () => {
+  getSecret().then((res: any) => {
+    let postData = res.data.data
+    msgForm.alibaba_cloud_access_key_id = postData.alibaba_cloud_access_key_id
+    msgForm.alibaba_cloud_access_key_secret =
+      postData.alibaba_cloud_access_key_secret
+    msgForm.sign_name = postData.sign_name
+    wxForm.wx_appid = postData.wx_appid
+    wxForm.wx_secret = postData.wx_secret
+  })
+}
 
 const submitMsg = () => {
   updateMessageSetting(msgForm).then((res: any) => {

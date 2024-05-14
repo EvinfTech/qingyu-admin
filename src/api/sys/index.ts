@@ -41,3 +41,11 @@ export const updateWXSetting = (data?: any) => {
     data,
   })
 }
+
+export const getSecret = (data?: any) => {
+  return request.request<string[]>({
+    url: '/saas/setting/get-secret',
+    method: 'post',
+    data,
+  })
+}

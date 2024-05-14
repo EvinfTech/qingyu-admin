@@ -20,24 +20,24 @@ const menuRoute: RouteRecordRaw[] = [
     path: '',
     component: () => import('@/views/layout/MainLayout.vue'),
     redirect: '/',
-    meta: { icon: 'HomeFilled', title: '首页', alwaysShow: true },
+    meta: { icon: 'House', title: '首页', alwaysShow: true },
     children: [
       {
         path: '',
         component: () => import('@/views/home/index.vue'),
-        meta: { icon: 'HomeFilled', title: '首页', hideMenu: true },
+        meta: { icon: 'House', title: '首页', hideMenu: true },
       },
     ],
   },
   {
     path: '/book',
     component: () => import('@/views/layout/MainLayout.vue'),
-    meta: { icon: 'Grid', title: '场地预定', alwaysShow: true },
+    meta: { icon: 'Calendar', title: '场地预定', alwaysShow: true },
     children: [
       {
         path: '',
         component: () => import('@/views/book/index.vue'),
-        meta: { icon: 'Grid', title: '订场管理', hideMenu: true },
+        meta: { icon: 'Calendar', title: '场地预定', hideMenu: true },
       },
     ],
   },
@@ -45,12 +45,12 @@ const menuRoute: RouteRecordRaw[] = [
   {
     path: '/order',
     component: () => import('@/views/layout/MainLayout.vue'),
-    meta: { icon: 'List', title: '订单管理', alwaysShow: true },
+    meta: { icon: 'Tickets', title: '订单管理', alwaysShow: true },
     children: [
       {
         path: '',
         component: () => import('@/views/order/index.vue'),
-        meta: { icon: 'List', title: '订单管理', hideMenu: true },
+        meta: { icon: 'Tickets', title: '订单管理', hideMenu: true },
       },
     ],
   },
@@ -74,7 +74,7 @@ const menuRoute: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('@/views/user/index.vue'),
-        meta: { icon: 'Avatar', title: '用户管理' },
+        meta: { icon: 'Memo', title: '用户列表' },
       },
       {
         path: 'feedback',
@@ -86,7 +86,7 @@ const menuRoute: RouteRecordRaw[] = [
   {
     path: '/shop',
     component: () => import('@/views/layout/MainLayout.vue'),
-    meta: { icon: 'Shop', title: '场馆管理' },
+    meta: { icon: 'School', title: '场馆管理' },
     children: [
       {
         path: 'base',
