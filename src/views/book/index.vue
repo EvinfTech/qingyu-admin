@@ -49,10 +49,10 @@
 
                 <el-tag
                   v-else
+                  class="el-check-box"
                   :type="getTagType(scope.row[column])"
                   effect="dark"
                   size="large"
-                  style="width: 90px; height: 48px"
                 >
                   {{ scope.row[column] }}
                 </el-tag>
@@ -85,7 +85,13 @@
     <el-col :xs="24" :sm="6">
       <div class="book_info">
         <h3>预约信息</h3>
-        <el-form ref="ruleFormRef" :model="form" :rules="rules">
+        <el-form
+          ref="ruleFormRef"
+          :model="form"
+          :rules="rules"
+          label-position="right"
+          label-width="50px"
+        >
           <el-form-item label="姓名" prop="name">
             <el-input v-model="form.name" />
           </el-form-item>
@@ -98,8 +104,8 @@
         </el-form>
         <h3>场次信息</h3>
         <div class="book_site_list">
-          <div class="right-middle-show" v-for="item in showSeletSite">
-            <div>线下预约:{{ item.site }}</div>
+          <div class="book-site-box" v-for="item in showSeletSite">
+            <div>{{ item.site }}</div>
             <div class="flex_box" v-for="data in item.data">
               <div>{{ data.time_value }}</div>
               <div style="color: #f44336">
@@ -109,7 +115,7 @@
             <div>{{ selectDate }} 共{{ item.data.length }}场</div>
           </div>
         </div>
-        <div>
+        <div class="book_total">
           <div class="flex_box">
             <h3>合计</h3>
             <h3 style="color: #f44336">{{ formatPrice(showTotal) }}</h3>
@@ -241,7 +247,7 @@ const getTagType = (name: string) => {
     case '不可预定':
       return 'info'
     default:
-      return 'primary'
+      return 'info'
   }
 }
 
@@ -270,6 +276,8 @@ const updateData = (date: any) => {
           dataObj[value.site_name] = '线下预定'
         } else if (value.online_reserve_time_enum.includes(numberKey)) {
           dataObj[value.site_name] = '线上预定'
+        } else if (value.status == 'N') {
+          dataObj[value.site_name] = '停用'
         } else if (value.store_time_enum.includes(numberKey)) {
           value.price.forEach((v: any) => {
             // 可预定场地的信息
@@ -277,7 +285,7 @@ const updateData = (date: any) => {
             if (
               //排除今天已经超时的
               selectDate.value == dayjs().format('YYYY-MM-DD') &&
-              v.time_enum <= nowHour
+              v.time_enum <= nowHour + 1
             ) {
               dataObj[value.site_name] = '不可预定'
             } else if (v.time_enum == numberKey) {
@@ -379,30 +387,36 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 .left-main {
   margin: 0 10px;
-
   .my_table {
     padding: 10px 0;
-    height: 75vh;
     --el-table-border-color: '#FFFFFF' !important;
+    --el-table-row-hover-bg-color: #fff;
+    height: calc(100vh - 220px);
   }
 }
 
 .book_info {
   background-color: #f6f6f6;
   padding: 10px 20px;
-  height: 87vh;
-  flex-direction: column; /* 垂直方向排列子元素 */
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+  height: calc(100vh - 110px);
   .book_site_list {
-    height: 46vh;
-    // height: 60%;
     overflow-y: auto;
-    .right-middle-show {
+    flex-grow: 1;
+    .book-site-box {
       padding: 10px 20px;
       border-radius: 10px;
+      font-size: 14px;
       background-color: #eff3ff;
       line-height: 2rem;
       margin-bottom: 10px;
     }
+  }
+  .book_total {
+    margin-top: auto;
+    padding: 10px;
   }
 }
 

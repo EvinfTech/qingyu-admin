@@ -23,6 +23,7 @@ export function getShopCapital(data: any) {
   })
 }
 
+export const getBillListAPI = '/saas/get/bill/list'
 // 获取流水数据
 export function getBillList(data: any) {
   return r.request<string[]>({

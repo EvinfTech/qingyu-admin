@@ -20,7 +20,7 @@
             <div v-if="scope.row.photo.length > 0">
               <el-image
                 class="preview_img_box"
-                style="width: 100px; height: 100px"
+                style="width: 30px; height: 30px"
                 :src="getUrl(scope.row.photo[0])"
                 :zoom-rate="1.2"
                 :max-scale="7"
@@ -28,7 +28,6 @@
                 :preview-src-list="getSrcList(scope.row.photo)"
                 :initial-index="0"
                 fit="cover"
-                :z-index="zIndex"
               />
               <!-- <span> 共{{ scope.row.photo.length }}张</span> -->
             </div>
@@ -59,8 +58,6 @@ let query = ref<TableQueryType>({
   size: 10,
   params: {},
 })
-
-const zIndex = ref(28888)
 
 const getUrl = (url: string) => {
   return baseURL + '/' + url

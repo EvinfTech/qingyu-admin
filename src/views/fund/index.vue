@@ -10,7 +10,7 @@
               <div>{{ item.value }}</div>
             </div>
             <el-divider border-style="dashed" />
-            <div><p class="grid_tips">昨日 --</p></div>
+            <!-- <div><p class="grid_tips">昨日 --</p></div> -->
           </div>
         </el-col>
       </el-row>
@@ -20,28 +20,23 @@
         <span class="fund_title">账单流水</span>
         <el-button type="warning" @click="cash()">全部提现</el-button>
       </p>
-      <el-table :data="tableData" stripe style="width: 100%">
+    </div>
+
+    <data-table
+      :options="options"
+      :query="query"
+      ref="tableRef"
+      :show-search="false"
+    >
+      <template #columns>
         <el-table-column type="index" width="50" />
-
-        <el-table-column label="时间">
-          <template #default="scope">
-            <span>{{ scope.row.time }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="关联单号">
-          <template #default="scope">
-            <span>{{ scope.row.transaction_serial_no }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="类型">
+        <el-table-column prop="transaction_serial_no" label="关联单号" />
+        <el-table-column prop="content" label="类型">
           <template #default="scope">
             <el-tag v-if="scope.row.type == 'T'" type="warning">提现</el-tag>
             <el-tag v-else>结算</el-tag>
           </template>
         </el-table-column>
-
         <el-table-column label="流水金额">
           <template #default="scope">
             <span>{{ formatMoney(scope.row.money) }}</span>
@@ -53,29 +48,20 @@
             <span>{{ formatMoney(scope.row.balance) }}</span>
           </template>
         </el-table-column>
-      </el-table>
-      <div class="el_page">
-        <el-pagination
-          v-model:current-page="currentPage4"
-          v-model:page-size="pageSize4"
-          :page-sizes="[10, 20, 50]"
-          :small="small"
-          :disabled="disabled"
-          :background="background"
-          layout="total, sizes, prev, pager, next"
-          :total="dataTotal"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </div>
+      </template>
+    </data-table>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getShopCapital, getBillList, withdrawal } from '@/api/shop'
+import { getShopCapital, getBillListAPI, withdrawal } from '@/api/shop'
 import { formatMoney } from '@/utils/money'
+import type {
+  OptionsType,
+  TableQueryType,
+} from '@/components/DataTable/src/types'
+import { DataTable } from '@/components/DataTable'
 
 const testData1 = ref([
   { text: '总订单额', value: '' },
@@ -96,11 +82,22 @@ const data2 = ref([
 
 const withdrawalMoeny = ref(0)
 
-const tableData = ref([])
+// 表格查询参数
+let query = ref<TableQueryType>({
+  page: 1,
+  size: 10,
+  params: {},
+})
+
+// 表格默认参数
+let options = ref<OptionsType>({
+  listUrl: getBillListAPI,
+})
+
+const tableRef = ref()
 
 onMounted(() => {
   updateInfo()
-  updateTable()
 })
 
 const updateInfo = () => {
@@ -126,19 +123,6 @@ const updateInfo = () => {
   })
 }
 
-const updateTable = () => {
-  getBillList({
-    shop_id: 1,
-    page: currentPage4.value,
-    size: pageSize4.value,
-  }).then((res: any) => {
-    tableData.value = []
-    tableData.value = res.data.data.list
-    dataTotal.value = res.data.data.total
-    console.log('aaa', res.data.data.list)
-  })
-}
-
 const cash = () => {
   ElMessageBox.confirm('确认要全部提现吗?', '提示', {
     confirmButtonText: '确认',
@@ -153,25 +137,10 @@ const cash = () => {
           type: 'success',
         })
         updateInfo()
-        updateTable()
+        tableRef.value.refresh()
       }
     })
   })
-}
-
-// 分页信息
-const currentPage4 = ref(1)
-const pageSize4 = ref(20)
-const dataTotal = ref(0)
-const small = ref(false)
-const background = ref(false)
-const disabled = ref(false)
-
-const handleSizeChange = () => {
-  updateTable()
-}
-const handleCurrentChange = () => {
-  updateTable()
 }
 </script>
 
@@ -227,4 +196,3 @@ p {
   }
 }
 </style>
-@/api/shop

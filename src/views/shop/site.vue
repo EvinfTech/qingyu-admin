@@ -12,6 +12,8 @@
     <div class="hr"></div>
 
     <el-table :data="tableData" stripe style="width: 100%">
+      <el-table-column type="index" width="50" />
+
       <el-table-column prop="name" label="场地名称" />
       <el-table-column label="可预约时间">
         <template #default="scope">
@@ -37,11 +39,17 @@
           <div>{{ scope.row.busy_price / 100 }}元</div>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态">
+      <el-table-column prop="status" label="场地启用状态">
         <template #default="scope">
-          <div>
+          <el-switch
+            v-model="scope.row.status"
+            @change="changeStatus(scope.row)"
+            active-value="Y"
+            inactive-value="N"
+          />
+          <!-- <div>
             {{ scope.row.status == 'Y' ? '正常' : '不可用' }}
-          </div>
+          </div> -->
         </template>
       </el-table-column>
       <el-table-column prop="weekend_busy" label="周末是否为忙时">
@@ -117,7 +125,6 @@
         <el-input v-model="form.busy_price" />
       </el-form-item>
       <el-form-item label="状态">
-        <!--        <el-input v-model="form.status"/>-->
         <el-radio-group v-model="form.status" class="ml-4">
           <el-radio value="Y" size="large">正常</el-radio>
           <el-radio value="N" size="large">关闭</el-radio>
@@ -219,7 +226,6 @@ onMounted(() => {
 const updateInfo = () => {
   getSiteList({ shop_id: 1 }).then((res: any) => {
     tableData.value = res.data.data
-    console.log('表数据', tableData.value)
   })
 }
 
@@ -229,7 +235,7 @@ const submit = async (formEl: any) => {
     if (valid) {
       submitForm()
     } else {
-      console.log('error submit!', fields)
+      console.log('提交失败!', fields)
     }
   })
 }
@@ -284,26 +290,25 @@ const delSiteOp = () => {
   })
 }
 
-function getWorkTime(data: any) {
+const getWorkTime = (data: any) => {
   return data.site_start_time + ' ~ ' + data.site_end_time
 }
 
-function createSite() {
+const createSite = () => {
   func = 'create'
   dialogFormVisible.value = true
   form = ref<any>({})
 }
 
-function getBusyTime(data: any) {
+const getBusyTime = (data: any) => {
   return data.busy_start_time + ' ~ ' + data.busy_end_time
 }
 
-function siteStartTimeChange() {
-  console.log('出发了特定的函数')
+const siteStartTimeChange = () => {
   form.value.site_end_time = ''
 }
 
-function edit(data: any) {
+const edit = (data: any) => {
   func = 'update'
   dialogFormVisible.value = true
   let copyObj1 = copyObj(data)
@@ -312,23 +317,30 @@ function edit(data: any) {
   form.value.busy_price = copyObj1.busy_price / 100
 }
 
-function copyObj(obj: any): any {
-  // 非对象 {}
+const copyObj = (obj: any) => {
   const isObj = typeof obj !== 'object' || obj === null
 
   if (isObj) return obj
 
-  // 是数组 []
   const isArr = Array.isArray(obj)
-  // 确认数据类型
   const newObj: any = isArr === true ? [] : {}
 
-  // 遍历对象
   for (const key in obj) {
     newObj[key] = copyObj(obj[key])
   }
-
   return newObj
+}
+
+const changeStatus = (data: any) => {
+  updateSite(data).then((res: any) => {
+    if (res.data.code == 200) {
+      ElMessage({
+        type: 'success',
+        message: '操作成功',
+      })
+      updateInfo()
+    }
+  })
 }
 </script>
 

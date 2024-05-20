@@ -57,7 +57,7 @@ const menuRoute: RouteRecordRaw[] = [
   {
     path: '/fund',
     component: () => import('@/views/layout/MainLayout.vue'),
-    meta: { icon: 'Money', title: '资金流水', alwaysShow: true },
+    meta: { icon: 'Money', title: '资金流水', alwaysShow: false },
     children: [
       {
         path: '',

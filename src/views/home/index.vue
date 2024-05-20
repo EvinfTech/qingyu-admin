@@ -4,7 +4,7 @@
       <el-avatar
         class="hidden-xs-only"
         shape="square"
-        :size="160"
+        :size="120"
         :src="baseURL + '/' + store.avatar"
       />
       <div class="store_head_main">
@@ -14,7 +14,7 @@
         </p>
         <p class="store_tips">已使用轻羽场馆管理平台运营{{ serverDay }}天</p>
         <div class="business_grid">
-          <el-row :gutter="30">
+          <el-row :gutter="20">
             <el-col
               :sm="8"
               :xs="24"
@@ -99,10 +99,6 @@
       </el-row>
 
       <el-row :gutter="40">
-        <!-- <el-col :sm="0" :xs="0">
-          <div class="business_chart">
-            <AreaChart :data="siteCount"></AreaChart></div
-        ></el-col> -->
         <el-col :sm="24" :xs="24">
           <div class="site_box">
             <p class="flex-box-space-between">
@@ -244,35 +240,20 @@ const toBook = () => {
   .store_box {
     border-radius: 12px;
     background-color: #f8f8ff;
-    padding: 20px;
+    padding: 10px 20px;
     display: flex;
     align-items: center;
     .store_head_main {
-      margin: 0 30px;
+      margin: 0 20px;
       width: 85%;
       .store_name {
-        font-size: 32px;
+        font-size: 24px;
         font-weight: bold;
         margin: 0;
       }
       .store_tips {
         font-size: 14px;
         line-height: 30px;
-      }
-      .store_card {
-        display: flex;
-        justify-content: space-between;
-        text-align: center;
-
-        .card_text {
-          line-height: 30px;
-        }
-        .card_value {
-          line-height: 42px;
-          font-size: 28px;
-          font-weight: bold;
-          color: #165dff;
-        }
       }
     }
   }
@@ -285,14 +266,8 @@ const toBook = () => {
       padding: 20px;
       height: 400px;
       overflow-y: auto;
-
       p {
         margin-top: 0;
-      }
-
-      .order_detail {
-        padding: 10px 20px;
-        /* background-color: #f5f7fa; */
       }
     }
     .site_box {
@@ -313,9 +288,8 @@ const toBook = () => {
           width: 140px;
           text-align: center;
           background-color: #fff;
-          padding: 20px;
+          padding: 10px 20px;
           border-radius: 10px;
-          margin-bottom: 20px;
         }
       }
     }
@@ -330,8 +304,7 @@ const toBook = () => {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 16px;
-      margin-bottom: 10px;
+      padding: 10px;
       gap: 8px;
       flex-grow: 1;
       align-self: stretch;
@@ -345,7 +318,7 @@ const toBook = () => {
     border-radius: 6px;
     background-color: #fff;
     width: 100%;
-    height: 400px;
+    height: 360px;
   }
 
   .business_chart2 {
